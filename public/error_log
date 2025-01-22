@@ -1,0 +1,4 @@
+[11-Oct-2024 04:35:25 America/New_York] PHP Fatal error:  Uncaught Error: Failed opening required '/home2/promogif/planetdesign.ma/public/../vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home2/promogif/planetdesign.ma/public/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home2/promogif/planetdesign.ma/public/index.php on line 34
