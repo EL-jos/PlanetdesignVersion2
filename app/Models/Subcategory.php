@@ -24,4 +24,8 @@ class Subcategory extends Model
     public function articles(){
         return $this->belongsToMany(Article::class);
     }
+
+    public function getFirstImageAttribute(){
+        return $this->document()->where('type','image')->first()->path;
+    }
 }

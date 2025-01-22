@@ -4,7 +4,9 @@ namespace App\Http\Controllers\backend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Document;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -58,6 +60,11 @@ class CategoryController extends Controller
 
         if ($category){
 
+            if ($request->hasFile('document')) {
+                $files = $request->file('document');
+                $this->saveDocument($files, $category, 'image');
+            }
+
             return redirect()->route('category.index')->with('success', "Action reusit");
 
         }
@@ -103,6 +110,11 @@ class CategoryController extends Controller
 
         if ($isUpdate){
 
+            if ($request->hasFile('document')) {
+                $files = $request->file('document');
+                $this->saveDocument($files, $category, 'image');
+            }
+
             return redirect()->route('category.index')->with('success', "Action reusit");
 
         }
@@ -142,5 +154,41 @@ class CategoryController extends Controller
         }
         return back()->with('error', 'Echec de réstauration');
 
+    }
+
+    private function moveImage($file)
+    {
+        $currentDateTime = Carbon::now();
+        $formattedDateTime = $currentDateTime->format('Ymd_His');
+
+        $path_file = (string) Str::uuid() . '.' . $file->getClientOriginalExtension();
+        $file->move(public_path('assets/resources/categories/'), $path_file);
+
+        return "assets/resources/categories/" . $path_file;
+    }
+    private function deleteImage($path)
+    {
+        if ( file_exists( public_path($path) ) ) {
+            unlink(public_path($path));
+        }
+    }
+
+    private function saveDocument($files, Category $category, string $type){
+
+        if (is_array($files)) {
+
+            foreach ($files as $file) {
+                $documentPath = $this->moveImage($file);
+                $document = new Document(['path' => $documentPath, 'type' => $type]);
+                $category->document()->save($document);
+            }
+
+        } else {
+
+            $documentPath = $this->moveImage($files);
+            $document = new Document(['path' => $documentPath, 'type' => $type]);
+            $category->document()->save($document);
+
+        }
     }
 }

@@ -107,7 +107,7 @@
                     <button type="submit" class="el-center-box"><i class="fas fa-search"></i></button>
                 </form>
                 @if($user->exists)
-                    <ul>
+                    {{--<ul>
                         <li class="el-icon">
                             <a href="{{ route('catalog.page', $user) }}" class="el-center-box">
                                 <i class="fas fa-list"></i><span id="el-nb-catalog">{{ $user->catalogs->count() }}</span>
@@ -126,9 +126,9 @@
                             </a>
                             <p>Mes favoris</p>
                         </li>
-                    </ul>
+                    </ul>--}}
                 @else
-                    <ul>
+                    {{--<ul>
                         <li class="el-icon">
                             <a href="{{ route('catalog.page', $user) }}" class="el-center-box">
                                 @php
@@ -162,7 +162,7 @@
                             </a>
                             <p>Mes favoris</p>
                         </li>
-                    </ul>
+                    </ul>--}}
                 @endif
             </div>
         </div>
@@ -189,7 +189,7 @@
                                     @foreach($category->subcategories as $subcategory)
                                         <li>
                                         <a href="{{ route('subcategory.show', ['categorySlug' => $category->slug, 'subcategorySlug' => $subcategory->slug] ) }}" class="el-center-box">
-                                            <img src="{{ asset($subcategory->image->path) }}" alt=" {{ $category->name }} {{ $subcategory->name }}">
+                                            <img src="{{ asset($subcategory->first_image) }}" alt=" {{ $category->name }} {{ $subcategory->name }}">
                                             <p>{{ $subcategory->name }}</p>
                                         </a>
                                     </li>
@@ -211,7 +211,7 @@
                                     @foreach($category->subcategories as $subcategory)
                                         <li>
                                             <a href="{{ route('subcategory.show', ['categorySlug' => $category->slug, 'subcategorySlug' => $subcategory->slug] ) }}">
-                                                <img src="{{ asset($subcategory->image->path) }}" alt="{{ $subcategory->name }}">
+                                                <img src="{{ asset($subcategory->first_image) }}" alt="{{ $subcategory->name }}">
                                                 <p>{{ $subcategory->name }}</p>
                                             </a>
                                         </li>

@@ -184,7 +184,21 @@ class PageController extends Controller
             return redirect()->route('identification.page')->with('warning', "Veillez vous connecter pour bénéficier pleinnement de nos fonctionnalités");
         }
         if($request->attributes->has('htmx')){
-            return view('layouts.article.form-catalog', ['article' => $article]);
+
+            if($article->variants && !$request->exists("variant_id")){
+                return view('layouts.article.content', [
+                    'article' => $article,
+                    'code' => 1,
+                    'message' => "Veillez choisir une variante du produit"
+                ]);
+            }elseif ($article->variants && $request->exists("variant_id")){
+
+                return view('layouts.article.content', []);
+
+            }elseif (!$article->variants && !$request->exists("variant_id")){
+                return view('layouts.article.content', []);
+            }
+            //return view('layouts.article.form-catalog', ['article' => $article]);
         }
         return response()->json(['article' => $article]);
     }
@@ -212,9 +226,6 @@ class PageController extends Controller
         $category = Category::where('slug', $categorySlug)->firstOrFail();
 
         if ($category) {
-
-            // La catégorie a été trouvée, faites quelque chose avec $category
-            $category->increment('view');
 
             // Récupérez toutes les sous-catégories liées à cette catégorie
             $subcategoryIds = $category->subcategories->pluck('id')->toArray();

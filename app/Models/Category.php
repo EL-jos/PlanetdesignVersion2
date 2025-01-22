@@ -15,4 +15,12 @@ class Category extends Model
     public function subcategories(){
         return $this->hasMany(Subcategory::class);
     }
+
+    public function document(){
+        return $this->morphOne(Document::class, 'documentable');
+    }
+
+    public function getFirstImageAttribute(){
+        return $this->document()->where('type','image')->first()->path;
+    }
 }

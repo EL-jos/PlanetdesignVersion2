@@ -25,7 +25,7 @@ Route::controller(\App\Http\Controllers\frontend\PageController::class)->group(f
     Route::get('/catalogs', 'catalogs')->name('catalogs.page');
     Route::get('/identification', 'identification')->name('identification.page');
     Route::get('/page/{article}/addQuote', 'addQuote')->middleware("htmlx")->name('addQuote.page');
-    Route::get('/page/{article}/addCatalog', 'addCatalog')->middleware("htmlx")->name('addCatalog.page');
+    Route::post('/page/{article}/addCatalog', 'addCatalog')->middleware("htmlx")->name('addCatalog.page');
     Route::post('/page/search', 'search')->name('search.page');
     Route::get('/page/content/{article}', 'content')->name('content.page');
 
@@ -43,7 +43,7 @@ Route::controller(\App\Http\Controllers\AuthController::class)->group(function (
 
 Route::controller(\App\Http\Controllers\backend\ArticleController::class)->group(function (){
     Route::post('/article/{article}/addQuote', 'addQuote')->middleware("htmlx")->name('addQuote.article');
-    Route::post('/article/{article}/addCatalog', 'addCatalog')->middleware("htmlx")->name('addCatalog.article');
+    //Route::post('/article/{article}/addCatalog', 'addCatalog')->middleware("htmlx")->name('addCatalog.article');
     Route::post('/ajax/filter-articles', 'filterArticles')->name('filter.articles');
     Route::get('/generate-pdf/{article}', 'generateCatalogPdf')->name('generate.pdf');
     Route::get('/article/read/{quote}', 'read')->name('read.article');
@@ -144,7 +144,7 @@ Route::group(['prefix' => 'backend'], function () {
         Route::post('/document/updateDocumentOrder', 'updateDocumentOrder')->name('updateDocumentOrder.document');
     });
 
-    Route::resource('category', \App\Http\Controllers\backend\CategoryController::class);
+    Route::resource('category', \App\Http\Controllers\backend\CategoryController::class)->except(['show']);
     Route::controller(\App\Http\Controllers\backend\CategoryController::class)->group(function () {
         Route::get('/trashed/categories', 'trashed')->name('category.trashed');
         Route::delete('/restore/category/{category}', 'restore')->name('category.restore');
@@ -153,7 +153,7 @@ Route::group(['prefix' => 'backend'], function () {
         Route::get('/get-categories', 'getCategories')->name('category.getCategories');
     });
 
-    Route::resource('subcategory', \App\Http\Controllers\backend\SubcategoryController::class);
+    Route::resource('subcategory', \App\Http\Controllers\backend\SubcategoryController::class)->except(['show']);
     Route::controller(\App\Http\Controllers\backend\SubcategoryController::class)->group(function () {
         Route::get('/trashed/subcategories', 'trashed')->name('subcategory.trashed');
         Route::delete('/restore/subcategory/{subcategory}', 'restore')->name('subcategory.restore');
@@ -162,13 +162,14 @@ Route::group(['prefix' => 'backend'], function () {
         Route::get('/get-subCategories/articles', 'getArticles')->name('subcategory.getArticles');
     });
 
-    Route::resource('article', \App\Http\Controllers\backend\ArticleController::class);
+    Route::resource('article', \App\Http\Controllers\backend\ArticleController::class)->except(['show']);
     Route::resource('variant', \App\Http\Controllers\backend\VariantController::class);
     Route::resource('color', \App\Http\Controllers\backend\ColorController::class);
     Route::resource('size', \App\Http\Controllers\backend\SizeController::class);
     Route::resource('quote', \App\Http\Controllers\backend\QuoteController::class);
     Route::resource('availability', \App\Http\Controllers\backend\AvailabilityController::class);
     Route::resource('offer', \App\Http\Controllers\backend\OfferController::class);
+    Route::resource('material', \App\Http\Controllers\backend\MaterialController::class);
 
 
     /*Route::group(['prefix' => 'trash'], function () {

@@ -41,51 +41,32 @@
                 </div>
                 <div class="card-body">
                     <div class="el-btns-controls">
-                        <a href="{{ route('category.create') }}" class="btn btn-block btn-primary">Ajouter</a>
-                        <a href="{{ route(('category.trashed')) }}" class="btn btn-block btn-primary">Supprimées</a>
+                        <a href="{{ route('material.create') }}" class="btn btn-block btn-primary">Ajouter</a>
+                        <a href="{{ route('material.create') }}" class="btn btn-block btn-primary">Supprimées</a>
                     </div>
                     <table id="example1" class="table table-bordered table-striped">
                         <thead>
                             <tr>
                                 <th>No.</th>
-                                <th>Image</th>
                                 <th>Name</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($categories as $category)
+                            @foreach($materials as $material)
                                 <tr>
                                     <td>{{ $loop->index  + 1}}</td>
-                                    <td> <img height="71px" src="{{ $category->document()->where('type','image')->first() ? asset($category->document()->where('type','image')->first()->path) : '' }}"></td>
-                                    <td>{{ \Illuminate\Support\Str::title($category->name) }}</td>
+                                    <td>{{\Illuminate\Support\Str::title( $material->name) }}</td>
                                     <td>
                                         <div class="d-flex" style="gap: .5rem;">
-                                            @if(!$category->trashed())
-                                                <a href="{{ route('category.edit', $category) }}" class="btn bg-gradient-warning"><i class="fas fa-edit"></i></a>
-                                                <button onclick="document.getElementById('el-delete-form-{{ $category->id }}').submit()" class="btn bg-gradient-danger">
-                                                    <form id="el-delete-form-{{ $category->id }}" action="{{ route('category.destroy', $category) }}" method="post">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                    </form>
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </button>
-                                            @else
-                                                <button onclick="document.getElementById('el-restore-form-{{ $category->id }}').submit()" class="btn bg-gradient-danger">
-                                                    <form id="el-restore-form-{{ $category->id }}" action="{{ route('category.restore', $category) }}" method="post">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                    </form>
-                                                    <i class="fas fa-trash-restore"></i>
-                                                </button>
-                                                <button onclick="document.getElementById('el-remove-form-{{ $category->id }}').submit()" class="btn bg-gradient-danger">
-                                                    <form id="el-remove-form-{{ $category->id }}" action="{{ route('category.remove', $category) }}" method="post">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                    </form>
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </button>
-                                            @endif
+                                            <a href="{{ route('material.edit', $material) }}" class="btn bg-gradient-warning"><i class="fas fa-edit"></i></a>
+                                            <button onclick="document.getElementById('el-delete-form-{{ $material->id }}').submit()" class="btn bg-gradient-danger">
+                                                <form action="{{ route('material.destroy', $material) }}" id="el-delete-form-{{ $material->id }}" method="post">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                </form>
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -94,7 +75,6 @@
                         <tfoot>
                             <tr>
                                 <th>No.</th>
-                                <th>Image</th>
                                 <th>Name</th>
                                 <th>Action</th>
                             </tr>

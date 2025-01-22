@@ -83,34 +83,6 @@
             <form action="{{ $category->exists ? route('category.update', $category) : route('category.store') }}" method="post" enctype="multipart/form-data">
                 @csrf
                 @method($category->exists ? 'PUT' : 'POST')
-                {{--<div class="row">
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label>Text</label>
-                            <input type="text" class="form-control" placeholder="Enter ...">
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label>Text Disabled</label>
-                            <input type="text" class="form-control" placeholder="Enter ..." disabled>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label>Textarea</label>
-                            <textarea class="form-control" rows="3" placeholder="Enter ..."></textarea>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label>Textarea Disabled</label>
-                            <textarea class="form-control" rows="3" placeholder="Enter ..." disabled></textarea>
-                        </div>
-                    </div>
-                </div>--}}
 
                 <div class="row">
                     <div class="col-sm-12">
@@ -118,23 +90,9 @@
                             <input type="text" class="form-control is-valid" name="name" id="name" placeholder="Nom ..." value="{{ $category->exists ? $category->name : old('name') }}">
                         </div>
                     </div>
-                    {{--<div class="col-sm-6">
-                        <div class="el-select2">
-                            <select id="menu_id" name="menu_id"  class="form-control el-select">
-                                <option value="">Menu ?</option>
-                                @foreach($menus as $menu)
-                                    @if($category->exists && $category->menu && $category->menu->id === $menu->id)
-                                        <option selected value="{{ $menu->id }}">{{ $menu->name }}</option>
-                                    @else
-                                        <option value="{{ $menu->id }}">{{ $menu->name }}</option>
-                                    @endif
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>--}}
                 </div>
 
-                {{--@if($category->exists)
+                @if($category->exists)
                     @if($category->document)
                         <div class="el-container-grid-column-document">
                             <div id="el-container-picture" style="width: 100%;">
@@ -154,7 +112,7 @@
                     @endif
                 @else
                     @include('backend.layouts.file', ['isMultiple' => false])
-                @endif--}}
+                @endif
 
                 <div style="padding: 0" class="card-footer">
                     <button type="submit" class="btn btn-primary">

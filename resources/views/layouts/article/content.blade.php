@@ -1,39 +1,24 @@
-@if($article->images->count() > 1)
+@if($article->variants->count() > 1)
     <div class="owl-carousel">
-        @foreach($article->images as $image)
-            <img src="{{ asset($image->path) }}" data-src="{{ asset($image->path) }}" alt="{{ $article->name }}">
+        @foreach($article->variants as $variant)
+            <img src="{{ asset($variant->image->path) }}" data-src="{{ asset($variant->image->path) }}" data-id="{{ $variant->id }}" alt="{{ $article->name }}">
         @endforeach
     </div>
 @endif
 <div class="el-footer-article">
-    <h3 class="el-ref-article">Réf.: {{ $article->reference }}</h3>
-    @if($user->exists)
-        <a title="Ajouter au devis"
-           hx-get="{{ route('addQuote.page', $article) }}"
-           hx-trigger="click"
-           hx-target=".el-article .el-content #el-content-{{$article->id}}"
-           href="javascript:;" id="el-add-devis"><img src="{{ asset('assets/img/Add2devis-2.png') }}" alt=""></a>
-        <a title="Ajouter au catalogue"
-           hx-post="{{ route('addCatalog.article', $article) }}"
-           hx-trigger="click"
-           hx-target=".el-article .el-content #el-content-{{$article->id}}"
-           hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'
-           href="javascript:;"
-           id="el-add-catalogue"><img src="{{ asset('assets/img/add2wish.png') }}" alt=""></a>
-    @else
-        <a title="Ajouter au devis"
-           hx-get="{{ route('addQuote.page', $article) }}"
-           hx-trigger="click"
-           hx-target=".el-article .el-content #el-content-{{$article->id}}"
-           href="javascript:;" id="el-add-devis"><img src="{{ asset('assets/img/Add2devis-2.png') }}" alt=""></a>
-        <a title="Ajouter au catalogue"
-           hx-post="{{ route('addCatalog.article', $article) }}"
-           hx-trigger="click"
-           hx-target=".el-article .el-content #el-content-{{$article->id}}"
-           hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'
-           href="javascript:;"
-           id="el-add-catalogue"><img src="{{ asset('assets/img/add2wish.png') }}" alt=""></a>
-    @endif
+    <h3 class="el-ref-article">Réf.: {{ $article->ugs }}</h3>
+    <a title="Ajouter au devis"
+       hx-get="{{ route('addQuote.page', $article) }}"
+       hx-trigger="click"
+       hx-target=".el-article .el-content #el-content-{{$article->id}}"
+       href="javascript:;" id="el-add-devis"><img src="{{ asset('assets/img/Add2devis-2.png') }}" alt=""></a>
+    <a title="Ajouter au catalogue"
+       hx-post="{{ route('addCatalog.page', $article) }}"
+       hx-trigger="click"
+       hx-target=".el-article .el-content #el-content-{{$article->id}}"
+       hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'
+       href="javascript:;"
+       class="el-add-catalogue"><img src="{{ asset('assets/img/add2wish.png') }}" alt=""></a>
 </div>
 
 @if(request()->attributes->has('htmx'))
@@ -82,13 +67,13 @@
                         @break
                 @endswitch
                 @break
-            @case(1)
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Erreur',
-                    text: "{!! $message !!}"
-                });
-                @break
+        @case(1)
+            Swal.fire({
+                icon: 'error',
+                title: 'Erreur',
+                text: "{!! $message !!}"
+            });
+            @break
         @endswitch
     </script>
 @else

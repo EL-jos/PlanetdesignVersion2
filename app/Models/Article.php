@@ -60,12 +60,15 @@ class Article extends Model
         return $this->hasMany(Variant::class);
     }
 
-    public function getFirstImage()
+    public function getImagesAttribute(){
+        return $this->documents()->where('type', 'image')->get();
+    }
+    public function getFirstImageAttribute()
     {
         return $this->documents()->where('type', 'image')->first()->path;
     }
 
-    public function getLastImage()
+    public function getLastImageAttribute()
     {
         return $this->documents()->where('type', 'image')->get()->last()->path;
     }

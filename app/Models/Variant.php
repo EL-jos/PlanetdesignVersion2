@@ -64,4 +64,8 @@ class Variant extends Model
         return $this->morphMany(cart_item::class, 'cartable');
     }
 
+    public function getImageAttribute(){
+        return $this->document()->where('type', 'image')->first();
+    }
+
 }
