@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Article;
 use App\Models\Availability;
 use App\Models\Banner;
+use App\Models\Cart;
+use App\Models\cart_item;
 use App\Models\Catalog;
 use App\Models\Category;
 use App\Models\Color;
@@ -16,7 +18,9 @@ use App\Models\Material;
 use App\Models\Offer;
 use App\Models\Subcategory;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Jorenvh\Share\Share;
 
@@ -96,7 +100,7 @@ class PageController extends Controller
      * @param User $user
      */
 
-    public function quote(User $user){
+    public function cart(User $user){
         if(!session()->has('user')){
             $user = new User();
             //return redirect()->route('identification.page')->with('warning', "Veillez vous connecter pour bénéficier pleinnement de nos fonctionnalités");
@@ -104,9 +108,7 @@ class PageController extends Controller
 
         return view('quote', [
             'user' => $user,
-            'tab_devis' => Devis::where('ip_address', $_SERVER['REMOTE_ADDR'])
-                ->whereAnd('user_agent', $_SERVER['HTTP_USER_AGENT'])
-                ->get(),
+            'tab_devis' => Cart::all(),
         ]);
     }
 
@@ -159,54 +161,192 @@ class PageController extends Controller
      * @param  Article $article
      * @return \Illuminate\Http\Response
      */
-    public function addQuote(Request $request, Article $article){
+    public function addCart(Request $request, string $id, string $model){
 
-        if(!session()->has('user')){
-            $user = new User();
-            //return redirect()->route('identification.page')->with('warning', "Veillez vous connecter pour bénéficier pleinnement de nos fonctionnalités");
-        }else{
-            $user = User::find(session()->get('user'));
-        }
-        if($request->attributes->has('htmx')){
-            return view('layouts.article.form', ['article' => $article, 'user' => $user]);
-        }
-        return response()->json(['article' => $article, 'user' => $user]);
-    }
+        //dd($request->all(), $id, $model, session('user'));
 
-    /**
-     * @param Request $request
-     * @param Article $article
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
-     */
-    public function addCatalog(Request $request, Article $article){
+        /**
+         * @var User $user
+         */
+        $user = User::findOrfail(session('user'));
+        // Récupération de la wishlist de l'utilisateur
+        $cart = $user->cart ?? $user->cart()->save(new Cart());
 
-        if(!session()->has('user')){
-            return redirect()->route('identification.page')->with('warning', "Veillez vous connecter pour bénéficier pleinnement de nos fonctionnalités");
-        }
-        if($request->attributes->has('htmx')){
+        if ($model === Article::class) {
 
-            if($article->variants && !$request->exists("variant_id")){
-                return view('layouts.article.content', [
-                    'article' => $article,
-                    'code' => 1,
-                    'message' => "Veillez choisir une variante du produit"
-                ]);
-            }elseif ($article->variants && $request->exists("variant_id")){
+            // Récupérer l'article par son ID
+            $article = Article::findOrFail($id);
 
-                return view('layouts.article.content', []);
+            // Vérifier si l'article a des variantes
+            if ($article->variants()->exists()) {
 
-            }elseif (!$article->variants && !$request->exists("variant_id")){
-                return view('layouts.article.content', []);
+                return redirect()->back()->with('warning', "Veuillez sélectionner une variante avant d'ajouter l'article au devis.");
+
             }
-            //return view('layouts.article.form-catalog', ['article' => $article]);
         }
-        return response()->json(['article' => $article]);
+
+        // Vérifier si l'élément existe déjà dans la wishlist
+        $existingItem = $cart->items()
+            ->where('cartable_id', $id)
+            ->where('cartable_type', $model)
+            ->first();
+
+        if ($existingItem) {
+            // Si l'élément existe déjà, vous pouvez décider de l'augmenter ou de ne rien faire
+            return redirect()->route('cart.page')->with('info', "Cet article est déjà dans votre devis.");
+        }
+
+        // Ajout d'un nouvel élément dans la wishlist
+        $isAdd = $cart->items()->create([
+            'cartable_id' => $id,
+            'cartable_type' => $model,
+        ]);
+
+
+        if($isAdd){
+            return redirect()->route('cart.page')->with('success', "Article ajouté dans votre devis avec succès");
+        }
+
+        return redirect()->back()->with('error', "Impossible d'ajouter cet article dans votre devis");
+
     }
 
-    /**
-     * @param Request $request
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
-     */
+    public function updateCartQuantity(Request $request, cart_item $cartItem)
+    {
+        //dd($request->all(), $wishlistItemId);
+        /**
+         * @var User $user
+         */
+        $user = User::findOrFail(session('user'));
+
+        // Récupérer la wishlist de l'utilisateur
+        $cart = $user->cart;
+
+        if (!$cart) {
+            return redirect()->route('cart.page')->with('error', "Votre devis est vide.");
+        }
+
+        // Rechercher l'élément de wishlist correspondant
+        //$wishlistItem = $wishlist->items()->findOrFail($wishlistItemId);
+
+        // Vérifier que la quantité est fournie et est un nombre positif
+        $newQuantity = $request->input('quantity');
+        if (!$newQuantity || $newQuantity < 1) {
+            return redirect()->route('cart.page')->with('error', "Quantité invalide.");
+        }
+
+        // Mettre à jour la quantité de l'élément
+        $cartItem->update(['quantity' => $newQuantity]);
+
+        return redirect()->route('cart.page')->with('success', "Quantité mise à jour avec succès.");
+    }
+
+    public function removeFromCart(string $cartItem)
+    {
+        /**
+         * @var User $user
+         */
+        $user = User::findOrFail(session('user'));
+
+        /**
+         * @var Cart $cart
+         */
+        $cart = $user->cart;
+
+
+        // Vérifiez si l'élément est dans le panier
+        $item = $cart->items()->find($cartItem);
+
+        if ($item) {
+            // Supprimer l'élément du wishlist
+            $item->delete();
+
+            // Redirige vers la page wishlist avec un message de succès
+            return redirect()->route('cart.page')->with('success', "Article supprimé de votre devis avec succès");
+        }
+
+        // Si l'élément n'est pas trouvé, redirige avec un message d'erreur
+        return redirect()->back()->with('error', "L'article n'a pas été trouvé dans votre devis.");
+    }
+
+    public function addCatalog(Request $request, string $id, string $model){
+
+        //dd($request->all(), $id, $model, session('user'));
+
+        /**
+         * @var User $user
+         */
+        $user = User::findOrfail(session('user'));
+        // Récupération de la wishlist de l'utilisateur
+        $catalog = $user->catalog ?? $user->catalog()->save(new Catalog());
+
+        if ($model === Article::class) {
+
+            // Récupérer l'article par son ID
+            $article = Article::findOrFail($id);
+
+            // Vérifier si l'article a des variantes
+            if ($article->variants()->exists()) {
+
+                return redirect()->back()->with('warning', "Veuillez sélectionner une variante avant d'ajouter l'article à votre catalogue.");
+
+            }
+        }
+
+        // Vérifier si l'élément existe déjà dans la wishlist
+        $existingItem = $catalog->items()
+            ->where('catalogable_id', $id)
+            ->where('catalogable_type', $model)
+            ->first();
+
+        if ($existingItem) {
+            // Si l'élément existe déjà, vous pouvez décider de l'augmenter ou de ne rien faire
+            return redirect()->route('catalog.page')->with('info', "Cet article est déjà dans votre catalogue.");
+        }
+
+        // Ajout d'un nouvel élément dans la wishlist
+        $isAdd = $catalog->items()->create([
+            'catalogable_id' => $id,
+            'catalogable_type' => $model,
+        ]);
+
+
+        if($isAdd){
+            return redirect()->route('catalog.page')->with('success', "Article ajouté dans votre catalogue avec succès");
+        }
+
+        return redirect()->back()->with('error', "Impossible d'ajouter cet article dans votre catalogue");
+
+    }
+
+    public function removeFromCatalog(string $catalogItem)
+    {
+        /**
+         * @var User $user
+         */
+        $user = User::findOrFail(session('user'));
+
+        /**
+         * @var Catalog $catalog
+         */
+        $catalog = $user->catalog;
+
+
+        // Vérifiez si l'élément est dans le panier
+        $item = $catalog->items()->find($catalogItem);
+
+        if ($item) {
+            // Supprimer l'élément du wishlist
+            $item->delete();
+
+            // Redirige vers la page wishlist avec un message de succès
+            return redirect()->route('catalog.page')->with('success', "Article supprimé de votre catalogue avec succès");
+        }
+
+        // Si l'élément n'est pas trouvé, redirige avec un message d'erreur
+        return redirect()->back()->with('error', "L'article n'a pas été trouvé dans votre catalogue.");
+    }
+
     public function search(Request $request){
         //dd($request->all());
         $keyword = '%' . htmlentities($request->input('Keyword')) . '%';
@@ -248,19 +388,12 @@ class PageController extends Controller
             return response()->json(['erreur' => 'Valeur invalide']);
         }
     }
+
     public function show_subcategory(string $categorySlug, string $subcategorySlug){
         // Récupérer la sous-catégorie basée sur le slug
         $subcategory = Subcategory::where('slug', $subcategorySlug)->firstOrFail();
 
         if ($subcategory){
-            // Vérifie si la page provient directement d'une catégorie
-            $referer = request()->server('HTTP_REFERER');
-            $isFromCategoryPage = strpos($referer, route('category.show', $subcategory->category)) !== false;
-
-            // Incrémente le nombre de vues de la catégorie si la page ne provient pas de la catégorie
-            if (!$isFromCategoryPage) {
-                $subcategory->category->increment('view');
-            }
 
             $articles = $subcategory->articles()->paginate(32);
             return view('subcategory', [
@@ -273,12 +406,29 @@ class PageController extends Controller
         }
 
     }
+
     public function show_article(string $articleSlug, string $articleRef){
-        $article = Article::where('reference', $articleRef)
+        $article = Article::where('ugs', $articleRef)
                             ->where('slug', $articleSlug)->firstOrFail();
 
         return view('article',[
             'article' => $article
         ]);
+    }
+
+    public function generateCatalogPdf(){
+
+        /**
+         * @var User $user
+         */
+        $user = User::findOrFail(session('user'));
+
+        if($user->exists){
+            return Pdf::loadView('generate-pdf-catalog', [
+                //'articles' => $articles
+                'catalog' => $user->catalog
+            ])->stream('mon_catalogue.pdf');
+        }
+
     }
 }

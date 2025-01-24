@@ -11,14 +11,14 @@
 
 @section('og_title', $subcategory->name)
 @section('og_description', htmlspecialchars_decode(strip_tags($subcategory->description)))
-@section('og_image', asset($subcategory->image->path))
+@section('og_image', asset($subcategory->first_image))
 @section('og_url', \Illuminate\Support\Facades\URL::current())
 @section('og_type', 'article')
 
 
 @section('twitter_title', $subcategory->name)
 @section('twitter_description', htmlspecialchars_decode(strip_tags($subcategory->description)))
-@section('twitter_image', asset($subcategory->image->path))
+@section('twitter_image', asset($subcategory->first_image))
 @section('twitter_url', \Illuminate\Support\Facades\URL::current())
 
 @section('head')
@@ -48,7 +48,7 @@
                 @foreach($subcategory->category->subcategories as $sub)
                     <a href="{{ route('subcategory.show', ['categorySlug' => $subcategory->category->slug, 'subcategorySlug' => $sub->slug]) }}" class="el-subcategorie">
                         <div class="el-boxImg">
-                            <img src="{{ asset($sub->image->path) }}" alt="{{ $sub->name }}">
+                            <img src="{{ asset($sub->first_image) }}" alt="{{ $sub->name }}">
                         </div>
                         <h2 class="el-name-subcategorie">{{ $sub->name }}</h2>
                     </a>

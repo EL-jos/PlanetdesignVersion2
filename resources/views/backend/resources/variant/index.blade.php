@@ -61,7 +61,7 @@
                                 <tr>
                                     <td>{{ $loop->index  + 1}}</td>
                                     <td> <img height="71px" src="{{ $variant->document()->where('type','image')->first() ? asset($variant->document()->where('type','image')->first()->path) : '' }}"></td>
-                                    <td>{{ $variant->article->ugs }}</td>
+                                    <td>{{ $variant->ugs }} <=> {{ $variant->article->ugs }}</td>
                                     <td>
                                         @foreach($variant->article->subcategories as $subcategory)
                                             @if(($loop->index + 1) === $variant->article->subcategories->count())

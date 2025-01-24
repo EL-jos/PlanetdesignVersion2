@@ -73,4 +73,45 @@ class Article extends Model
         return $this->documents()->where('type', 'image')->get()->last()->path;
     }
 
+    public function compressImage(int $w = 100, int $h = 100){
+
+        $width = $w;
+        $height = $h;
+
+        // Obtenez le chemin complet de l'image
+        $imagePath = public_path($this->first_image);
+
+        // Vérifier si le fichier existe
+        if (file_exists($imagePath)) {
+            // Redimensionner l'image
+            $image = \Intervention\Image\Facades\Image::make($imagePath);
+
+            // Redimensionner l'image si les paramètres de taille sont spécifiés
+            if ($width && $height) {
+                $image->fit($width, $height);
+            }
+
+            // Obtenez l'encodage de l'image redimensionnée
+            $encodedImage = $image->encode('data-url');
+
+            // Afficher l'image redimensionnée dans la balise <img>
+            //return $encodedImage;
+            //echo '<img src="'.$encodedImage.'">';
+            echo $encodedImage;
+        }else{
+            dd('Le fichier n\existe pas');
+        }
+
+    }
+
+    public function getVariantIsColorAttribute(): bool{
+        //dd($this->variants->first()->color === null);
+        return $this->variants->first()->color !== null;
+    }
+
+    public function getVariantIsSizeAttribute(): bool{
+        //dd($this->variants->first()->size === null);
+        return $this->variants->first()->size !== null;
+    }
+
 }

@@ -21,6 +21,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $guarded = [];
+    public $incrementing = false;
 
 
     protected static function boot()
@@ -38,10 +39,6 @@ class User extends Authenticatable
         });
     }
 
-    public function quotes(){
-        return $this->hasMany(Quote::class);
-    }
-
     public function orders(){
         return $this->hasMany(Order::class);
     }
@@ -51,9 +48,14 @@ class User extends Authenticatable
         return $this->hasMany(Favorite::class);
     }
 
-    public function catalogs()
+    public function catalog()
     {
-        return $this->hasMany(Catalog::class);
+        return $this->hasOne(Catalog::class);
+    }
+
+    public function cart()
+    {
+        return $this->hasOne(Cart::class);
     }
 
     public function toggleFavorite($articleId)

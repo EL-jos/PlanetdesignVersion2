@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Route;
 /*
 |--------------------------------------------------------------------------
@@ -17,21 +19,26 @@ Route::controller(\App\Http\Controllers\frontend\PageController::class)->group(f
     Route::get('/category', 'category')->name('category.page');
     Route::get('/arrival', 'arrival')->name('arrival.page');
     Route::get('/category/article', 'article')->name('article.page');
-    Route::get('/catalog/{user?}', 'catalog')->name('catalog.page');
+    Route::get('/catalog', 'catalog')->name('catalog.page');
     Route::get('/favorites/{user?}', 'favorites')->name('favorites.page');
-    Route::get('/quote/{user?}', 'quote')->name('quote.page');
+    Route::get('/cart', 'cart')->name('cart.page');
     Route::get('/destocking', 'destocking')->name('destocking.page');
     Route::get('/business', 'business')->name('business.page');
     Route::get('/catalogs', 'catalogs')->name('catalogs.page');
     Route::get('/identification', 'identification')->name('identification.page');
-    Route::get('/page/{article}/addQuote', 'addQuote')->middleware("htmlx")->name('addQuote.page');
-    Route::post('/page/{article}/addCatalog', 'addCatalog')->middleware("htmlx")->name('addCatalog.page');
+    Route::get('/add/{id}/{model}/cart', 'addCart')->name('addCart.page')->where('model', '.*');
+    Route::delete('/remove/cartItem/{cartItem}', 'removeFromCart')->name('cart.remove');
+    Route::post('/update/quantity/{cartItem}', 'updateCartQuantity')->name('cart.update.quantity');
+    Route::get('/add/{id}/{model}/catalog', 'addCatalog')->name('addCatalog.page')->where('model', '.*');
+    Route::delete('/remove/catalogItem/{catalogItem}', 'removeFromCatalog')->name('catalog.remove');
     Route::post('/page/search', 'search')->name('search.page');
     Route::get('/page/content/{article}', 'content')->name('content.page');
 
     Route::get('/category/{categorySlug}', 'show_category')->name('category.show');
     Route::get('/category/{categorySlug}/{subcategorySlug}', 'show_subcategory')->name('subcategory.show');
     Route::get('/article/{articleSlug}/{articleRef}', 'show_article')->name('article.show');
+
+    Route::get('/articles/generate-pdf/catalog', 'generateCatalogPdf')->name('generate.catalog');
 });
 
 Route::controller(\App\Http\Controllers\AuthController::class)->group(function (){
@@ -73,7 +80,7 @@ Route::controller(\App\Http\Controllers\FavoriteController::class)->group(functi
 
 
 //Route::get('/catalog/{user}/{article}', ['as' => 'catalog', 'uses' => 'App\\Http\\Controllers\\CatalogController@toggle'])->middleware("htmlx");
-Route::get('/articles/generate-pdf/catalog', ['as' => 'generate.catalog', 'uses' => 'App\\Http\\Controllers\\CatalogController@generateCatalogPdf']);
+//Route::get('/articles/generate-pdf/catalog', ['as' => 'generate.catalog', 'uses' => 'App\\Http\\Controllers\\CatalogController@generateCatalogPdf']);
 Route::get('/images/article/{path}', ['as' => 'show.image', 'uses' => 'App\\Http\\Controllers\\ImageController@show'])->where('path', '.*');
 //Route::post('/add/quote/public/{article}', ['as' => 'send.quote.public', 'uses' => 'App\\Http\\Controllers\\QuoteController@sendQuotePublic']);
 

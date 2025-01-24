@@ -6,10 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-class Catalog extends Model
+class CatalogItem extends Model
 {
     use HasFactory;
-
     protected $guarded = [];
     public $incrementing = false;
 
@@ -22,13 +21,13 @@ class Catalog extends Model
         });
     }
 
-    public function user()
+    public function catalogable()
     {
-        return $this->belongsTo(User::class);
+        return $this->morphTo();
     }
 
-    public function items()
+    public function catalog()
     {
-        return $this->hasMany(CatalogItem::class);
+        return $this->belongsTo(Catalog::class);
     }
 }

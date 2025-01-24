@@ -81,42 +81,35 @@
     </tr>
     </thead>
     <tbody>
-    @foreach($catalogs as $catalog)
+    @foreach($catalog->items as $item)
+
+        @php
+            switch($item->catalogable_type){
+                case "App/Models/Variant":
+                    $variant = \App\Models\Variant::find($item->catalogable_id);
+                    $article = $variant->article;
+                    $filename = $variant->document()->where('type','image')->first()
+                                ? $variant->document()->where('type','image')->first()->path
+                                : $variant->article->documents()->where('type','image')->first()->path;
+                    break;
+                default:
+                    $article = \App\Models\Article::find($item->catalogable_id);
+                    $filename = $article->documents()->where('type','image')->first()->path;
+                    break;
+            }
+        @endphp
+
         <tr>
             <td style="text-align: center; vertical-align: middle;">
                 <div style="display: inline-block;">
-                    <img src="{{ $catalog->article->compressImage(300, 300) }}" alt="">
+                    <img src="{{ isset($variant) ? $variant->compressImage(200, 200) : $article->compressImage(200, 200) }}" alt="">
                 </div>
             </td>
             <td>
                 <ul>
-                    <li><span>{{ $catalog->article->reference }}</span></li>
-                    <li class="el-item"><span>{{ $catalog->article->name }}</span> </li>
-                    <li class="el-item el-description">{!! htmlspecialchars_decode($catalog->article->description) !!}</li>
-                    @if($catalog->article->colors->count())
-                        <li class="el-item"><span>Couleur(s):</span> <p style="text-transform: capitalize; font-size: 13px; color: #666;">
-                                @foreach($catalog->article->colors as $color)
-                                    @if($catalog->article->colors->count() === ($loop->index + 1))
-                                        {{ $color->name }}.
-                                    @else
-                                        {{ $color->name }}; <!-- Utilisez le point-virgule au lieu du point ici -->
-                                    @endif
-                                @endforeach
-                            </p>
-                        </li>
-                    @endif
-                    @if($catalog->article->sizes->count())
-                        <li class="el-item"><span>Taille(s):</span> <p style="text-transform: capitalize; font-size: 13px; color: #666;">
-                                @foreach($catalog->article->sizes as $size)
-                                    @if($catalog->article->sizes->count() === ($loop->index + 1))
-                                        {{ $size->name }}.
-                                    @else
-                                        {{ $size->name }}; <!-- Utilisez le point-virgule au lieu du point ici -->
-                                    @endif
-                                @endforeach
-                            </p>
-                        </li>
-                    @endif
+                    <li><span>{{ isset($variant) ? \Illuminate\Support\Str::upper($variant->ugs) : \Illuminate\Support\Str::upper($article->ugs) }}</span></li>
+                    <li class="el-item"><span>{{ $article->name }}</span> </li>
+                    <li class="el-item el-description">{!! htmlspecialchars_decode($article->content) !!}</li>
                 </ul>
             </td>
         </tr>

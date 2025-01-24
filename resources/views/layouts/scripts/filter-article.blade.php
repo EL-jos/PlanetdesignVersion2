@@ -54,64 +54,28 @@
             smartSpeed: 1500,
             autoplayHoverPause: true,
             margin: 0,
-            center: true
+            center: true,
         });
 
-        document.querySelectorAll(".el-article").forEach(article => {
 
-            article.style.cursor = "pointer";
-
-            article.querySelector(".el-content img").addEventListener('click', (e) => {
-
-                e.stopPropagation();
-                e.preventDefault();
-
-                let newSrc = e.target.getAttribute("data-src");
-                let variantId = e.target.getAttribute("data-id");
-
-                article.querySelector(".el-boxImg img").setAttribute("src", newSrc);
-                article.querySelector(".el-add-catalogue").setAttribute("hx-vals", '{"variant_id": "' + variantId + '"}');
-
-                console.log(variantId, article.querySelector(".el-add-catalogue").getAttribute('hx-vals'))
-
-            });
-        })
-        /*$(".el-article").each(function () {
+        $(".el-article").each(function () {
 
             var $article = $(this);
-            var variantId = null;
-            var href = null;
 
-            $article.find(".el-content img").on("click", function () {
-                var newSrc = $(this).attr("data-src");
-                variantId = $(this).attr("data-id")
+            $article.find(".el-content .owl-carousel img").off("click").on("click", function () {
+                let newSrc = $(this).attr("data-src");
+                let id = $(this).attr("data-id");
+                let model = $(this).attr("data-model");
                 $article.find(".el-boxImg img").attr("src", newSrc);
 
-                $article.find(".el-add-catalogue").attr("hx-vals", '{"variant_id": "' + variantId +'"}');
+                $article.find(".el-add-catalogue").attr("href", `/add/${id}/${model}/catalog`);
+                $article.find(".el-add-devis").attr("href", `/add/${id}/${model}/cart`);
 
-                console.log(variantId, $article.find(".el-add-catalogue").attr("hx-vals"))
-                href = $article.find(".el-add-catalogue").attr("hx-post");
-                // Remplacer le placeholder dans l'URL avec le variantId
-                var route = "";
-                route = route.replace(':variantId', variantId); // Remplacer :variantId par la valeur dynamique
-
-                // Mettre à jour l'attribut hx-post avec l'URL contenant le variantId
-                $article.find(".el-add-catalogue").attr("hx-post", route);
+                console.log(id, $article.find(".el-add-catalogue").attr("href"))
 
             }).css('cursor', 'pointer');
 
-            $article.find(".el-add-catalogue").on('click', function (){
-
-                if(!href){
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Votre attention',
-                        text: "Veillez choisir une variante du produit"
-                    });
-                }
-            });
-
-        });*/
+        });
     }
     function reinitializeAllOwlCarousels() {
         const owlCarousels = document.querySelectorAll("#el-articles .owl-carousel");

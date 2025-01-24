@@ -106,64 +106,28 @@
                     <input type="search" name="Keyword" placeholder="Rechercher" />
                     <button type="submit" class="el-center-box"><i class="fas fa-search"></i></button>
                 </form>
-                @if($user->exists)
-                    {{--<ul>
-                        <li class="el-icon">
-                            <a href="{{ route('catalog.page', $user) }}" class="el-center-box">
-                                <i class="fas fa-list"></i><span id="el-nb-catalog">{{ $user->catalogs->count() }}</span>
-                            </a>
-                            <p>Mon catalogue</p>
-                        </li>
-                        <li class="el-icon">
-                            <a href="{{ route('quote.page', $user) }}" class="el-center-box">
-                                <i class="fas fa-briefcase"></i><span id="el-nb-quote">{{ $user->quotes->count() }}</span>
-                            </a>
-                            <p>Mon devis</p>
-                        </li>
-                        <li class="el-icon">
-                            <a href="{{ route('favorites.page', $user) }}" class="el-center-box">
-                                <i class="far fa-heart"></i><span id="el-nb-favorite">{{ $user->favorites->count() }}</span>
-                            </a>
-                            <p>Mes favoris</p>
-                        </li>
-                    </ul>--}}
-                @else
-                    {{--<ul>
-                        <li class="el-icon">
-                            <a href="{{ route('catalog.page', $user) }}" class="el-center-box">
-                                @php
-                                    $nb_catalog = \App\Models\Catalog::where('ip_address', $_SERVER['REMOTE_ADDR'])
-                                                                    ->whereAnd('user_agent', $_SERVER['HTTP_USER_AGENT'])
-                                                                    ->get()->count();
-                                @endphp
-                                <i class="fas fa-list"></i><span id="el-nb-catalog">{{ $nb_catalog }}</span>
-                            </a>
-                            <p>Mon catalogue</p>
-                        </li>
-                        <li class="el-icon">
-                            <a href="{{ route('quote.page', $user) }}" class="el-center-box">
-                                @php
-                                    $nb_quote = \App\Models\Devis::where('ip_address', $_SERVER['REMOTE_ADDR'])
-                                                                    ->whereAnd('user_agent', $_SERVER['HTTP_USER_AGENT'])
-                                                                    ->get()->count();
-                                @endphp
-                                <i class="fas fa-briefcase"></i><span id="el-nb-quote">{{ $nb_quote }}</span>
-                            </a>
-                            <p>Mon devis</p>
-                        </li>
-                        <li class="el-icon">
-                            <a href="{{ route('favorites.page', $user) }}" class="el-center-box">
-                                @php
-                                    $nb_favorite = \App\Models\Favorite::where('ip_address', $_SERVER['REMOTE_ADDR'])
-                                                                    ->whereAnd('user_agent', $_SERVER['HTTP_USER_AGENT'])
-                                                                    ->get()->count();
-                                @endphp
-                                <i class="far fa-heart"></i><span id="el-nb-favorite">{{ $nb_favorite }}</span>
-                            </a>
-                            <p>Mes favoris</p>
-                        </li>
-                    </ul>--}}
-                @endif
+
+                <ul>
+                    <li class="el-icon">
+                        <a href="{{ route('catalog.page', $user) }}" class="el-center-box">
+                            <i class="fas fa-list"></i><span id="el-nb-catalog">{{ $user->catalog->items->count() }}</span>
+                        </a>
+                        <p>Mon catalogue</p>
+                    </li>
+                    <li class="el-icon">
+                        <a href="{{ route('cart.page', $user) }}" class="el-center-box">
+                            <i class="fas fa-briefcase"></i><span id="el-nb-quote">{{ $user->cart->items->count() }}</span>
+                        </a>
+                        <p>Mon devis</p>
+                    </li>
+                    {{--<li class="el-icon">
+                        <a href="{{ route('favorites.page', $user) }}" class="el-center-box">
+                            <i class="far fa-heart"></i><span id="el-nb-favorite">{{ $user->favorites->count() }}</span>
+                        </a>
+                        <p>Mes favoris</p>
+                    </li>--}}
+                </ul>
+
             </div>
         </div>
     </section>
@@ -372,8 +336,8 @@
                     <h2>services</h2>
                     <ul>
                         <!-- <li><a href="">mon compte</a></li> -->
-                        <li><a href="{{ route('quote.page', $user) }}">demande devis</a></li>
-                        <li><a href="{{ route('catalog.page', $user) }}">ajouter au catalogue</a></li>
+                        <li><a href="{{ route('cart.page') }}">demande devis</a></li>
+                        <li><a href="{{ route('catalog.page') }}">ajouter au catalogue</a></li>
                         <li><a href="{{ route('favorites.page', $user) }}">favoris</a></li>
                         <li><a href="{{ route('business.page') }}">l'objets de la semaine</a></li>
                         <li><a href="{{ route('catalogs.page') }}">catalogue</a></li>

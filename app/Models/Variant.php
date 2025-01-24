@@ -68,4 +68,35 @@ class Variant extends Model
         return $this->document()->where('type', 'image')->first();
     }
 
+    public function compressImage(int $w = 100, int $h = 100){
+
+        $width = $w;
+        $height = $h;
+
+        // Obtenez le chemin complet de l'image
+        $imagePath = public_path($this->image->path);
+
+        // Vérifier si le fichier existe
+        if (file_exists($imagePath)) {
+            // Redimensionner l'image
+            $image = \Intervention\Image\Facades\Image::make($imagePath);
+
+            // Redimensionner l'image si les paramètres de taille sont spécifiés
+            if ($width && $height) {
+                $image->fit($width, $height);
+            }
+
+            // Obtenez l'encodage de l'image redimensionnée
+            $encodedImage = $image->encode('data-url');
+
+            // Afficher l'image redimensionnée dans la balise <img>
+            //return $encodedImage;
+            //echo '<img src="'.$encodedImage.'">';
+            echo $encodedImage;
+        }else{
+            dd('Le fichier n\existe pas');
+        }
+
+    }
+
 }

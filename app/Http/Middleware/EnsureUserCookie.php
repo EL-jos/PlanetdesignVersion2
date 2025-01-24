@@ -19,21 +19,28 @@ class EnsureUserCookie
      */
     public function handle(Request $request, Closure $next)
     {
-        // Vérifiez si le cookie 'user' existe
-        if (!$request->cookie('user-planetdesign')) {
+        //dd($request->cookie('user-planetdesign'));
+
+        $userId = $request->cookie('user-planetdesign');
+
+        // Si le cookie n'existe pas ou est vide
+        if (!$userId) {
+            // Créer un nouvel utilisateur
             $user = User::create([]);
 
             if ($user) {
-                // Durée en minutes (2 ans)
+                // Durée du cookie en minutes (2 ans)
                 $duration = 2 * 365 * 24 * 60;
 
                 // Créer un cookie et l'attacher à la réponse
-                Cookie::queue('user-planetdesign', $user->id, $duration);
+                Cookie::queue(Cookie::make('user-planetdesign', $user->id, $duration));
 
+                // Stocker l'ID utilisateur dans la session
                 Session::put('user', $user->id);
             }
-        }else{
-            Session::put('user', $request->cookie('user-planetdesign'));
+        } else {
+            // Si le cookie existe, l'enregistrer dans la session
+            Session::put('user', $userId);
         }
         return $next($request);
     }

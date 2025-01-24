@@ -1,14 +1,10 @@
-@if($is === 'quote')
-    <input value="{{ $quote->quantity }}"
-           hx-get="{{ route('modifyQuantityOfQuote.quote', ['quote' => $quote->id]) }}"
-           hx-trigger="input blur"
-           type="number" name="quantity" id="quantityInput" class="quantity-input" min="1">
-@elseif($is === 'devis')
-    <input value="{{ $devis->quantity }}"
-           hx-get="{{ route('modifyQuantityOfQuote.devis', ['devis' => $devis->id]) }}"
-           hx-trigger="input blur"
-           type="number" name="quantity" id="quantityInput" class="quantity-input" min="1">
-@endif
+
+<input value="{{ $item->quantity }}"
+       hx-post="{{ route('cart.update.quantity', ['cartItem' => $item->id]) }}"
+       hx-trigger="input blur"
+       hx-headers='{"X-CSRF-TOKEN": "{{ csrf_token() }}"}'
+       type="number" name="quantity" id="quantityInput" class="quantity-input" min="1">
+
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {

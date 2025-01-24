@@ -61,7 +61,7 @@ class VariantController extends Controller
         //dd($request->all());
 
         $validators = Validator::make($request->all(), [
-            //'ugs' => 'required|unique:variants,ugs',
+            'ugs' => 'required|unique:variants,ugs',
             'article_id' => 'required|exists:articles,id',
             'color_id' => 'nullable|exists:colors,id',
             'size_id' => 'nullable|exists:sizes,id',
@@ -74,6 +74,7 @@ class VariantController extends Controller
         }
 
         $variant = Variant::create([
+            'ugs' => $request->input('ugs'),
             'article_id' => $request->get('article_id'),
             'availability_id' => $request->input('availability_id', null),
             'color_id' => $request->input('color_id', null),
@@ -127,7 +128,7 @@ class VariantController extends Controller
         //dd($request->all());
 
         $validators = Validator::make($request->all(), [
-            //'ugs' => 'required|unique:variants,ugs',
+            'ugs' => 'required',
             'article_id' => 'required|exists:articles,id',
             'color_id' => 'nullable|exists:colors,id',
             'size_id' => 'nullable|exists:sizes,id',
@@ -140,6 +141,7 @@ class VariantController extends Controller
         }
 
         $isUpdate = $variant->update([
+            'ugs' => $request->input('ugs'),
             'article_id' => $request->get('article_id'),
             'availability_id' => $request->input('availability_id', null),
             'color_id' => $request->input('color_id', null),
