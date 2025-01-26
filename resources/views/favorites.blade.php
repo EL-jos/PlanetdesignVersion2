@@ -37,19 +37,34 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @if($user->exists)
-                            @foreach($user->favorites as $favorite)
+                        @if($user->wishlist)
+                            @foreach($user->wishlist->items as $item)
+                                @php
+                                    switch($item->wishlistable_type){
+                                        case "App/Models/Variant":
+                                            $variant = \App\Models\Variant::find($item->wishlistable_id);
+                                            $article = $variant->article;
+                                            $filename = $variant->document()->where('type','image')->first()
+                                                        ? $variant->document()->where('type','image')->first()->path
+                                                        : $variant->article->documents()->where('type','image')->first()->path;
+                                            break;
+                                        default:
+                                            $article = \App\Models\Article::find($item->wishlistable_id);
+                                            $filename = $article->documents()->where('type','image')->first()->path;
+                                            break;
+                                    }
+                                @endphp
                                 <tr>
-                                    <td><img src="{{ asset($favorite->article->first_image) }}" alt=""></td>
+                                    <td><img src="{{ asset($filename) }}" alt=""></td>
                                     <td>
-                                        <h4><a href="{{ route('article.show', ['articleSlug' => $favorite->article->slug, 'articleRef' => $favorite->article->reference]) }}">{{ $favorite->article->name }}</a></h4>
+                                        <h4><a href="{{ route('article.show', ['articleSlug' => $article->slug, 'articleRef' => $article->ugs]) }}">{{ $article->name }}</a></h4>
                                     </td>
-                                    <td><p>{{ \Illuminate\Support\Carbon::createFromFormat('Y-m-d H:i:s', $favorite->article->created_at)->format('d/m/Y') }}</p></td>
-                                    <td><p style="color: var(--green); text-transform: capitalize;">{{ $favorite->article->availability->name }}</p></td>
+                                    <td><p>{{ \Illuminate\Support\Carbon::createFromFormat('Y-m-d H:i:s', $article->created_at)->format('d/m/Y') }}</p></td>
+                                    <td><p style="color: var(--green); text-transform: capitalize;">{{ $article->availability->name }}</p></td>
                                     <td class="el-controls">
-                                        <a href="{{ route('favorite.quote', ['user' => $user, 'article' => $favorite->article]) }}" class="el-btn el-info el-center-box"><i class="far fa-file-alt"></i></a>
-                                        <a href="javascript:;" onclick="document.getElementById('el-delete-favorite-{{ $favorite->id }}').submit()" class="el-btn el-danger el-center-box">
-                                            <form action="{{ route("favorite.destroy", $favorite) }}" method="POST" id="el-delete-favorite-{{ $favorite->id }}">
+                                        <a href="{{ route('addCart.page', ['id' => $item->wishlistable_id, 'model' => $item->wishlistable_type]) }}" class="el-btn el-info el-center-box"><i class="far fa-file-alt"></i></a>
+                                        <a href="javascript:;" onclick="document.getElementById('el-delete-favorite-{{ $item->id }}').submit()" class="el-btn el-danger el-center-box">
+                                            <form action="{{ route("wishlist.remove", $item) }}" method="POST" id="el-delete-favorite-{{ $item->id }}">
                                                 @csrf
                                                 @method("DELETE")
                                             </form>
@@ -59,26 +74,7 @@
                                 </tr>
                             @endforeach
                         @else
-                            @foreach($tab_favorites as $favorite)
-                                <tr>
-                                    <td><img src="{{ asset($favorite->article->first_image) }}" alt=""></td>
-                                    <td>
-                                        <h4><a href="{{ route('article.show', ['articleSlug' => $favorite->article->slug, 'articleRef' => $favorite->article->reference]) }}">{{ $favorite->article->name }}</a></h4>
-                                    </td>
-                                    <td><p>{{ \Illuminate\Support\Carbon::createFromFormat('Y-m-d H:i:s', $favorite->article->created_at)->format('d/m/Y') }}</p></td>
-                                    <td><p style="color: var(--green); text-transform: capitalize;">{{ $favorite->article->availability->name }}</p></td>
-                                    <td class="el-controls">
-                                        <a href="{{ route('favorite.quote', ['user' => $user, 'article' => $favorite->article]) }}" class="el-btn el-info el-center-box"><i class="far fa-file-alt"></i></a>
-                                        <a href="javascript:;" onclick="document.getElementById('el-delete-favorite-{{ $favorite->id }}').submit()" class="el-btn el-danger el-center-box">
-                                            <form action="{{ route("favorite.destroy", $favorite) }}" method="POST" id="el-delete-favorite-{{ $favorite->id }}">
-                                                @csrf
-                                                @method("DELETE")
-                                            </form>
-                                            <i class="far fa-trash-alt"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
+
                         @endif
                         </tbody>
                     </table>

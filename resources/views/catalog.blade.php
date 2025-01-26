@@ -31,8 +31,10 @@
     <section id="el-favoris" class="el-center-box">
         <div class="el-content-area">
             <div class="el-grid-favoris">
-                <a href="{{ route("generate.catalog", $user) }}" target="_blank" class="el-download-catalog"><i class="fas fa-download"></i> Télécharger le catalogue</a>
-                <div class="el-container-table">
+                @if($user->catalog)
+                    <a href="{{ route("generate.catalog", $user) }}" target="_blank" class="el-download-catalog"><i class="fas fa-download"></i> Télécharger le catalogue</a>
+                @endif
+                    <div class="el-container-table">
                     <table id="table_id">
                         <thead>
                         <tr>
@@ -42,7 +44,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @if($user->exists)
+                        @if($user->catalog)
                             @foreach($user->catalog->items as $item)
 
                                 @php

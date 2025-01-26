@@ -27,7 +27,7 @@ class Wishlist extends Model
 
     public function items()
     {
-        return $this->hasMany(WishlistItem::class);
+        return $this->hasMany(wishlist_item::class);
     }
 
     // Méthode pour calculer le montant total de la wishlist

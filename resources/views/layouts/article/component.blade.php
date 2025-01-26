@@ -4,21 +4,29 @@
             <a href="{{ route('article.show', ['articleSlug' => $article->slug, 'articleRef' => $article->ugs]) }}">
                 <img src="{{ asset($article->first_image) }}" alt="{{ $article->name }}">
             </a>
-            {{--@if($user->exists)
-                <a href="javascript:;"
-                   hx-get="{{ route('favorite', ['user' => $user, 'article' => $article]) }}"
-                   hx-trigger="click"
-                   class="el-favorite">
-                    @include('layouts.favorite.favorite', ['user' => $user, 'article' => $article])
-                </a>
-            @else
-                <a href="javascript:;"
-                   hx-get="{{ route('favorite', ['article' => $article]) }}"
-                   hx-trigger="click"
-                   class="el-favorite">
-                    @include('layouts.favorite.favorite', ['user' => $user, 'article' => $article])
-                </a>
-            @endif--}}
+            <a href="{{ route('addWishlist.page', ['id' => $article->id, 'model' => \App\Models\Article::class]) }}"
+               class="el-favorite">
+                @php
+                    /**
+                     * @var \App\Models\User $user
+                     */
+                    $user = \App\Models\User::findOrfail(session('user'));
+                    $wishlist = $user->wishlist;
+                    if($wishlist){
+
+                        $ids = collect([]);
+                        $ids->push($article->id);
+                            if(!empty($article->variants->count())){
+                                $article->variants->map(function ($item) use ($ids){
+                                    $ids->push($item->id);
+                                });
+                            }
+                            $isInWishlist = $wishlist->items()->whereIn('wishlistable_id', $ids->toArray())->get();
+                    }
+
+                @endphp
+                <i class="{{ empty($isInWishlist->count()) ? 'far' : 'fas' }} fa-heart"></i>
+            </a>
         </div>
         <div class="el-content">
             <a href="{{ route('article.show', ['articleSlug' => $article->slug, 'articleRef' => $article->ugs]) }}">

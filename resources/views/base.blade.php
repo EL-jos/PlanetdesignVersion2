@@ -109,23 +109,23 @@
 
                 <ul>
                     <li class="el-icon">
-                        <a href="{{ route('catalog.page', $user) }}" class="el-center-box">
+                        <a href="{{ route('catalog.page') }}" class="el-center-box">
                             <i class="fas fa-list"></i><span id="el-nb-catalog">{{ $user->catalog ? $user->catalog->items->count() : 0 }}</span>
                         </a>
                         <p>Mon catalogue</p>
                     </li>
                     <li class="el-icon">
-                        <a href="{{ route('cart.page', $user) }}" class="el-center-box">
+                        <a href="{{ route('cart.page') }}" class="el-center-box">
                             <i class="fas fa-briefcase"></i><span id="el-nb-quote">{{ $user->cart ? $user->cart->items->count() : 0 }}</span>
                         </a>
                         <p>Mon devis</p>
                     </li>
-                    {{--<li class="el-icon">
-                        <a href="{{ route('favorites.page', $user) }}" class="el-center-box">
-                            <i class="far fa-heart"></i><span id="el-nb-favorite">{{ $user->favorites->count() }}</span>
+                    <li class="el-icon">
+                        <a href="{{ route('wishlist.page') }}" class="el-center-box">
+                            <i class="far fa-heart"></i><span id="el-nb-favorite">{{ $user->wishlist ? $user->wishlist->items->count() : 0 }}</span>
                         </a>
                         <p>Mes favoris</p>
-                    </li>--}}
+                    </li>
                 </ul>
 
             </div>
@@ -338,7 +338,7 @@
                         <!-- <li><a href="">mon compte</a></li> -->
                         <li><a href="{{ route('cart.page') }}">demande devis</a></li>
                         <li><a href="{{ route('catalog.page') }}">ajouter au catalogue</a></li>
-                        <li><a href="{{ route('favorites.page', $user) }}">favoris</a></li>
+                        <li><a href="{{ route('wishlist.page', $user) }}">favoris</a></li>
                         <li><a href="{{ route('business.page') }}">l'objets de la semaine</a></li>
                         <li><a href="{{ route('catalogs.page') }}">catalogue</a></li>
                     </ul>

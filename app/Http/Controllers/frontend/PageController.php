@@ -20,6 +20,7 @@ use App\Models\Offer;
 use App\Models\Order;
 use App\Models\Subcategory;
 use App\Models\User;
+use App\Models\Wishlist;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -75,14 +76,15 @@ class PageController extends Controller
     /**
      * @param User $user
      */
-    public function favorites(User $user){
-        if(!session()->has('user')){
-            $user = new User();
-            //return redirect()->route('identification.page')->with('warning', "Veillez vous connecter pour bénéficier pleinnement de nos fonctionnalités");
-        }
+    public function wishlist(){
+
+        /**
+         * @var User $user
+         */
+        $user = User::findOrfail(session('user'));
 
         $share = new Share();
-        $socialNetworks = $share->page(route('favorites.page', $user), "Catalogue de " .$user->lastname .' '. $user->firstname)
+        $socialNetworks = $share->page(route('wishlist.page', $user), "Catalogue de " .$user->lastname .' '. $user->firstname)
             ->facebook()
             ->twitter()
             ->pinterest()
@@ -92,9 +94,6 @@ class PageController extends Controller
         return view('favorites', [
             'user' => $user,
             'socialNetworks' => $socialNetworks,
-            'tab_favorites' => Favorite::where('ip_address', $_SERVER['REMOTE_ADDR'])
-                ->whereAnd('user_agent', $_SERVER['HTTP_USER_AGENT'])
-                ->get(),
         ]);
     }
 
@@ -322,6 +321,63 @@ class PageController extends Controller
 
     }
 
+    public function addWishlist(Request $request, string $id, string $model){
+
+        //dd($request->all(), $id, $model, session('user'));
+
+        /**
+         * @var User $user
+         */
+        $user = User::findOrfail(session('user'));
+        // Récupération de la wishlist de l'utilisateur
+        $wishlist = $user->wishlist ?? $user->wishlist()->save(new Wishlist());
+
+        if ($model === Article::class) {
+
+            // Récupérer l'article par son ID
+            $article = Article::findOrFail($id);
+
+            // Vérifier si l'article a des variantes
+            if ($article->variants()->exists()) {
+
+                return redirect()->back()->with('warning', "Veuillez sélectionner une variante avant d'ajouter l'article à vos favoris.");
+
+            }
+        }
+
+        // Vérifier si l'élément existe déjà dans la wishlist
+        $existingItem = $wishlist->items()
+            ->where('wishlistable_id', $id)
+            ->where('wishlistable_type', $model)
+            ->first();
+
+        if ($existingItem) {
+            //wishl ('wishlistable_id', $id)
+            $item = $wishlist->items()->where('wishlistable_id', $id)
+                     ->where('wishlistable_type', $model)
+                     ->first();
+            if($item->delete()){
+                // Si l'élément existe déjà, vous pouvez décider de l'augmenter ou de ne rien faire
+                return redirect()->back()->with('success', "Cet article est supprimé de vos favoris.");
+            }
+
+        }
+
+        // Ajout d'un nouvel élément dans la wishlist
+        $isAdd = $wishlist->items()->create([
+            'wishlistable_id' => $id,
+            'wishlistable_type' => $model,
+        ]);
+
+
+        if($isAdd){
+            return redirect()->route('wishlist.page')->with('success', "Article ajouté à vos favoris avec succès");
+        }
+
+        return redirect()->back()->with('error', "Impossible d'ajouter cet article à vos favoris");
+
+    }
+
     public function removeFromCatalog(string $catalogItem)
     {
         /**
@@ -344,6 +400,34 @@ class PageController extends Controller
 
             // Redirige vers la page wishlist avec un message de succès
             return redirect()->route('catalog.page')->with('success', "Article supprimé de votre catalogue avec succès");
+        }
+
+        // Si l'élément n'est pas trouvé, redirige avec un message d'erreur
+        return redirect()->back()->with('error', "L'article n'a pas été trouvé dans votre catalogue.");
+    }
+
+    public function removeFromWishlist(string $wishlistItem)
+    {
+        /**
+         * @var User $user
+         */
+        $user = User::findOrFail(session('user'));
+
+        /**
+         * @var Wishlist $wishlist
+         */
+        $wishlist = $user->wishlist;
+
+
+        // Vérifiez si l'élément est dans le panier
+        $item = $wishlist->items()->find($wishlistItem);
+
+        if ($item) {
+            // Supprimer l'élément du wishlist
+            $item->delete();
+
+            // Redirige vers la page wishlist avec un message de succès
+            return redirect()->route('wishlist.page')->with('success', "Article supprimé de vos favoris avec succès");
         }
 
         // Si l'élément n'est pas trouvé, redirige avec un message d'erreur

@@ -20,7 +20,9 @@ Route::controller(\App\Http\Controllers\frontend\PageController::class)->group(f
     Route::get('/arrival', 'arrival')->name('arrival.page');
     Route::get('/category/article', 'article')->name('article.page');
     Route::get('/catalog', 'catalog')->name('catalog.page');
-    Route::get('/favorites/{user?}', 'favorites')->name('favorites.page');
+    Route::get('/wishlist', 'wishlist')->name('wishlist.page');
+    Route::get('/add/{id}/{model}/wishlist', 'addWishlist')->name('addWishlist.page')->where('model', '.*');
+    Route::delete('/remove/wishlistItem/{wishlistItem}', 'removeFromWishlist')->name('wishlist.remove');
     Route::get('/cart', 'cart')->name('cart.page');
     Route::get('/destocking', 'destocking')->name('destocking.page');
     Route::get('/business', 'business')->name('business.page');
@@ -41,6 +43,7 @@ Route::controller(\App\Http\Controllers\frontend\PageController::class)->group(f
     Route::get('/articles/generate-pdf/catalog', 'generateCatalogPdf')->name('generate.catalog');
     Route::post('/cart/send', 'sendDevis')->name('sendCart.cart');
     Route::delete('/cart/destroy/', 'destroyAllCartOfThisUser')->name('destroyAllCartOfThisUser.cart');
+    //Route::get('/favorite/add/cart/{id}/{model}', 'addCart')->name('wishlist.cart');
 });
 
 Route::controller(\App\Http\Controllers\AuthController::class)->group(function (){
@@ -75,8 +78,8 @@ Route::controller(\App\Http\Controllers\DevisController::class)->group(function 
 });
 
 Route::controller(\App\Http\Controllers\FavoriteController::class)->group(function (){
-    Route::get('/favorite/{article}/{user?}', 'toggle')->middleware("htmlx")->name('favorite');
-    Route::get('/favorite/add/quote/{article}/{user?}', 'addToQuote')->name('favorite.quote');
+    //Route::get('/favorite/{article}/{user?}', 'toggle')->middleware("htmlx")->name('favorite');
+    Route::get('/favorite/add/cart/{id}/{model}', 'addToQuote')->name('wishlist.cart');
 
 });
 

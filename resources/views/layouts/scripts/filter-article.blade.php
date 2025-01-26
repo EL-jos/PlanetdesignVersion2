@@ -70,6 +70,7 @@
 
                 $article.find(".el-add-catalogue").attr("href", `/add/${id}/${model}/catalog`);
                 $article.find(".el-add-devis").attr("href", `/add/${id}/${model}/cart`);
+                $article.find(".el-favorite").attr("href", `/add/${id}/${model}/wishlist`);
 
                 console.log(id, $article.find(".el-add-catalogue").attr("href"))
 
