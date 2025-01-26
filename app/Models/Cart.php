@@ -60,4 +60,35 @@ class Cart extends Model
 
         });
     }
+
+    public function createOrderFromCart()
+    {
+        // Utiliser une transaction pour s'assurer que toutes les opérations se passent correctement
+        return DB::transaction(function () {
+
+            $user = $this->user;
+
+            // Créer une nouvelle commande
+            $order = Order::create([
+                'user_id' => $user->id,
+                //'status_id' => 4
+            ]);
+
+            // Ajouter les items de la wishlist dans la commande
+            foreach ($this->items as $cartItem) {
+                $order->items()->create([
+                    'orderable_id' => $cartItem->cartable_id,
+                    'orderable_type' => $cartItem->cartable_type,
+                    'quantity' => $cartItem->quantity,
+                ]);
+            }
+
+            // Vider le panier après création de la commande
+            $this->items()->delete();
+
+            // Retourner la commande créée
+            return $order;
+
+        });
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\frontend;
 
 use App\Http\Controllers\Controller;
+use App\Mail\QuoteSend;
 use App\Models\Article;
 use App\Models\Availability;
 use App\Models\Banner;
@@ -16,10 +17,12 @@ use App\Models\Devis;
 use App\Models\Favorite;
 use App\Models\Material;
 use App\Models\Offer;
+use App\Models\Order;
 use App\Models\Subcategory;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Jorenvh\Share\Share;
@@ -429,6 +432,78 @@ class PageController extends Controller
                 'catalog' => $user->catalog
             ])->stream('mon_catalogue.pdf');
         }
+
+    }
+
+
+    public function sendDevis(Request $request){
+        /**
+         * @var User $user
+         */
+        $user = User::findOrFail(session('user'));
+
+        $validators = Validator::make($request->all(), [
+            'lastname' => 'required|min:3|exists:users,lastname',
+            'firstname' => 'required|min:3|exists:users,firstname',
+            'email' => 'required|email:rfc,dns|exists:users,email',
+            'company' => 'nullable|min:10|max:50',
+            'content' => 'required|min:3'
+        ]);
+        $errors = $validators->errors();
+        if($validators->fails()){
+            return back()->withErrors($errors)->withInput();
+        }
+
+        $isUpdate = $user->update([
+            'firstname' => $request->input('firstname'),
+            'lastname' => $request->input('lastname'),
+            'email' => $request->input('email'),
+        ]);
+
+        if(!$isUpdate){
+            return redirect()->back()->with('error', "Impossible de soumettre votre devis")->withInput();
+        }
+
+        // Récupérer la wishlist de l'utilisateur
+        /**
+         * @var Cart $cart
+         */
+        $cart = $user->cart;
+
+        // Vérifier si la wishlist n'est pas vide
+        if ($cart->items->isEmpty()) {
+            return redirect()->route('cart.page')->with('error', 'Votre devis est vide.');
+        }
+
+        //Creation de la commande
+        /**
+         * @var Order $order
+         */
+        $order = $cart->createOrderFromCart();
+
+        if($order){
+
+            $order->content = $request->input('content');
+            if($order->save()){
+                Mail::to(env('MAIL_TO_ADDRESS'))->send(new QuoteSend($order));
+                return redirect()->back()->with('success', "Votre devis a été soumi avec succès");
+            }
+            return redirect()->back()->with('error', "Impossible de soumettre votre devis");
+        }
+        return redirect()->back()->with('error', "Impossible de soumettre votre devis");
+    }
+
+    public function destroyAllCartOfThisUser()
+    {
+        /**
+         * @var User $user
+         */
+        $user = User::findOrFail(session('user'));
+
+        if($user->cart()->delete()){
+            return redirect()->back()->with('success', "Le Devis a été supprimé avec succès");
+        }
+        return redirect()->back()->with('error', "Impossible de supprimer le devis");
 
     }
 }

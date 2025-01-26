@@ -66,20 +66,33 @@
                 <tr>
                     <th>Référence</th>
                     <th>Désignation</th>
-                    <th>Couleur \ Taille</th>
                     <th>Quantité</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($order->quotes as $quote)
+                @foreach ($order->items as $item)
+                    @php
+                        switch($item->orderable_type){
+                            case "App/Models/Variant":
+                                $variant = \App\Models\Variant::find($item->orderable_id);
+                                $article = $variant->article;
+                                $filename = $variant->document()->where('type','image')->first()
+                                            ? $variant->document()->where('type','image')->first()->path
+                                            : $variant->article->documents()->where('type','image')->first()->path;
+                                break;
+                            default:
+                                $article = \App\Models\Article::find($item->orderable_id);
+                                $filename = $article->documents()->where('type','image')->first()->path;
+                                break;
+                        }
+                    @endphp
                     <tr>
-                        <td>{{ $quote->article->reference }}</td>
-                        <td>{!! $quote->article->description !!}</td>
-                        <td> @if($quote->colors->count() && $quote->sizes->count()) Couleur: {{ $quote->colors->first()->name }} <br> Taille: {{ $quote->sizes->first()->name }} @elseif(!$quote->colors->count() && $quote->sizes->count()) {{ $quote->sizes->first()->name }} @elseif($quote->colors->count() && !$quote->sizes->count()) {{ $quote->colors->first()->name }} @endif </td>
-                        <td>{{ $quote->quantity }}</td>
+                        <td>{{ isset($variant) ? \Illuminate\Support\Str::upper($variant->ugs) : \Illuminate\Support\Str::upper($article->ugs) }}</td>
+                        <td>{!! $article->content !!}</td>
+                        <td>{{ $item->quantity }}</td>
                     </tr>
                     <tr>
-                        <td colspan="4" style="text-align: center; vertical-align: middle;"> <img src="{{ $quote->article->compressImage(300, 300) }}" /> </td>
+                        <td colspan="4" style="text-align: center; vertical-align: middle;"> <img src="{{ isset($variant) ? $variant->compressImage(200, 200) : $article->compressImage(200, 200) }}" /> </td>
                     </tr>
                 @endforeach
             </tbody>

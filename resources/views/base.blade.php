@@ -110,13 +110,13 @@
                 <ul>
                     <li class="el-icon">
                         <a href="{{ route('catalog.page', $user) }}" class="el-center-box">
-                            <i class="fas fa-list"></i><span id="el-nb-catalog">{{ $user->catalog->items->count() }}</span>
+                            <i class="fas fa-list"></i><span id="el-nb-catalog">{{ $user->catalog ? $user->catalog->items->count() : 0 }}</span>
                         </a>
                         <p>Mon catalogue</p>
                     </li>
                     <li class="el-icon">
                         <a href="{{ route('cart.page', $user) }}" class="el-center-box">
-                            <i class="fas fa-briefcase"></i><span id="el-nb-quote">{{ $user->cart->items->count() }}</span>
+                            <i class="fas fa-briefcase"></i><span id="el-nb-quote">{{ $user->cart ? $user->cart->items->count() : 0 }}</span>
                         </a>
                         <p>Mon devis</p>
                     </li>

@@ -39,6 +39,8 @@ Route::controller(\App\Http\Controllers\frontend\PageController::class)->group(f
     Route::get('/article/{articleSlug}/{articleRef}', 'show_article')->name('article.show');
 
     Route::get('/articles/generate-pdf/catalog', 'generateCatalogPdf')->name('generate.catalog');
+    Route::post('/cart/send', 'sendDevis')->name('sendCart.cart');
+    Route::delete('/cart/destroy/', 'destroyAllCartOfThisUser')->name('destroyAllCartOfThisUser.cart');
 });
 
 Route::controller(\App\Http\Controllers\AuthController::class)->group(function (){
@@ -57,13 +59,13 @@ Route::controller(\App\Http\Controllers\backend\ArticleController::class)->group
     Route::get('/article/export', 'export')->name('article.export');
 });
 
-Route::controller(\App\Http\Controllers\backend\QuoteController::class)->group(function (){
+/*Route::controller(\App\Http\Controllers\backend\QuoteController::class)->group(function (){
     Route::delete('/quote/destroy/{user}', 'destroyAllQuoteOfThisUser')->name('destroyAllQuoteOfThisUser.quote');
     Route::get('/modify-quantity-of-quote/quote/{quote}', 'modifyQuantityOfQuote')->middleware("htmlx")->name('modifyQuantityOfQuote.quote');
     Route::post('/send-devis/{user}', 'sendDevis')->name('sendDevis.quote');
     Route::post('/add/quote/public', 'sendQuotePublic')->name('send.quote.public');
 
-});
+});*/
 
 Route::controller(\App\Http\Controllers\DevisController::class)->group(function (){
     Route::delete('/devis/destroy/{user_agent}/{ip_address}', 'destroyAllQuoteOfThisUser')->name('destroyAllQuoteOfThisUser.devis');

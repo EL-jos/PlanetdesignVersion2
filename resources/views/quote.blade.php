@@ -43,57 +43,61 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($user->cart->items as $item)
-                                @php
-                                    switch($item->cartable_type){
-                                        case "App/Models/Variant":
-                                            $variant = \App\Models\Variant::find($item->cartable_id);
-                                            $article = $variant->article;
-                                            $filename = $variant->document()->where('type','image')->first()
-                                                        ? $variant->document()->where('type','image')->first()->path
-                                                        : $variant->article->documents()->where('type','image')->first()->path;
-                                            break;
-                                        default:
-                                            $article = \App\Models\Article::find($item->cartable_id);
-                                            $filename = $article->documents()->where('type','image')->first()->path;
-                                            break;
-                                    }
-                                @endphp
-                                <tr>
-                                    <td><img src="{{ asset($filename) }}" alt=""></td>
-                                    <td>
-                                        <h4><a href="{{ route('article.show', ['articleSlug' => $article->slug, 'articleRef' => $article->ugs]) }}">{{ $article->name }}</a></h4>
-                                        @if(isset($variant))
+                            @if($user->cart)
 
-                                            @if($variant->color)
-                                                <li style="margin: 1rem 0 0 1rem;">{{ $variant->color->name }} ({{ \Illuminate\Support\Str::upper($variant->ugs) }})</li>
-                                            @elseif($variant->size)
-                                                <li style="margin: 1rem 0 0 1rem;">{{ $variant->size->name}}< ({{ \Illuminate\Support\Str::upper($variant->ugs) }})/li>
+                                @foreach($user->cart->items as $item)
+                                    @php
+                                        switch($item->cartable_type){
+                                            case "App/Models/Variant":
+                                                $variant = \App\Models\Variant::find($item->cartable_id);
+                                                $article = $variant->article;
+                                                $filename = $variant->document()->where('type','image')->first()
+                                                            ? $variant->document()->where('type','image')->first()->path
+                                                            : $variant->article->documents()->where('type','image')->first()->path;
+                                                break;
+                                            default:
+                                                $article = \App\Models\Article::find($item->cartable_id);
+                                                $filename = $article->documents()->where('type','image')->first()->path;
+                                                break;
+                                        }
+                                    @endphp
+                                    <tr>
+                                        <td><img src="{{ asset($filename) }}" alt=""></td>
+                                        <td>
+                                            <h4><a href="{{ route('article.show', ['articleSlug' => $article->slug, 'articleRef' => $article->ugs]) }}">{{ $article->name }}</a></h4>
+                                            @if(isset($variant))
+
+                                                @if($variant->color)
+                                                    <li style="margin: 1rem 0 0 1rem;">{{ $variant->color->name }} ({{ \Illuminate\Support\Str::upper($variant->ugs) }})</li>
+                                                @elseif($variant->size)
+                                                    <li style="margin: 1rem 0 0 1rem;">{{ $variant->size->name}}< ({{ \Illuminate\Support\Str::upper($variant->ugs) }})/li>
+                                                @endif
+
                                             @endif
+                                        </td>
+                                        <td>
+                                            @include('layouts.quote.quantity', ['item' => $item])
+                                        </td>
+                                        <td class="el-controls">
+                                            <a href="javascript:;" onclick="document.getElementById('el-form-delete-{{ $item->id }}').submit()" class="el-btn el-danger el-center-box">
+                                                <form id="el-form-delete-{{ $item->id }}" action="{{ route('cart.remove', $item) }}" method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                </form>
+                                                <i class="far fa-trash-alt"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
 
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @include('layouts.quote.quantity', ['item' => $item])
-                                    </td>
-                                    <td class="el-controls">
-                                        <a href="javascript:;" onclick="document.getElementById('el-form-delete-{{ $item->id }}').submit()" class="el-btn el-danger el-center-box">
-                                            <form id="el-form-delete-{{ $item->id }}" action="{{ route('cart.remove', $item) }}" method="POST">
-                                                @csrf
-                                                @method('DELETE')
-                                            </form>
-                                            <i class="far fa-trash-alt"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
+                            @endif
                         </tbody>
                     </table>
                 </div>
                 @if(!empty($user->cart->items))
                     <div class="el-list-controls">
                         <a href="javascript:;" class="el-btn" onclick="document.getElementById('el-form-clear-quote-list').submit()">
-                            <form id="el-form-clear-quote-list" method="POST" action="{{ route('destroyAllQuoteOfThisUser.quote', $user) }}">
+                            <form id="el-form-clear-quote-list" method="POST" action="{{ route('destroyAllCartOfThisUser.cart') }}">
                                 @csrf
                                 @method('DELETE')
                             </form>
@@ -101,7 +105,7 @@
                         </a>
                         <a href="" class="el-btn">Retour à la boutique</a>
                     </div>
-                    <form action="{{ route('sendDevis.quote', $user) }}" method="POST">
+                    <form action="{{ route('sendCart.cart', $user) }}" method="POST">
                         @csrf
                         <div class="el-row">
                             <div class="el-col">
