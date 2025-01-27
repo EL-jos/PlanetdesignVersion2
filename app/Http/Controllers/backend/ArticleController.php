@@ -59,6 +59,7 @@ class ArticleController extends Controller
             'content' => 'nullable|string',
             'document' => 'nullable|array',
             'document.*' => 'image|mimes:jpeg,jpg,png,gif,webp|max:1024',
+            'priority' => 'required|integer'
         ]);
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
@@ -73,6 +74,7 @@ class ArticleController extends Controller
             'slug' => Str::slug($request->input('mane'), '-'),
             'content' => $request->input('content', $request->input('name')),
             'availability_id' => $request->input('availability_id', null),
+            'priority' => $request->input('priority', 0),
         ]);
 
         if($article){
@@ -125,6 +127,7 @@ class ArticleController extends Controller
             'content' => 'nullable|string',
             'document' => 'nullable|array',
             'document.*' => 'image|mimes:jpeg,jpg,png,gif,webp|max:1024',
+            'priority' => 'required|integer'
         ]);
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
@@ -139,6 +142,7 @@ class ArticleController extends Controller
             'slug' => Str::slug($request->input('mane'), '-'),
             'content' => $request->input('content', $request->input('name')),
             'availability_id' => $request->input('availability_id', null),
+            'priority' => $request->input('priority', 0),
         ]);
 
         if($isUpdate){

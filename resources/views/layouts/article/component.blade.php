@@ -12,6 +12,7 @@
                      */
                     $user = \App\Models\User::findOrfail(session('user'));
                     $wishlist = $user->wishlist;
+                    $isInWishlist = collect([]);
                     if($wishlist){
 
                         $ids = collect([]);

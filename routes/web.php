@@ -62,21 +62,6 @@ Route::controller(\App\Http\Controllers\backend\ArticleController::class)->group
     Route::get('/article/export', 'export')->name('article.export');
 });
 
-/*Route::controller(\App\Http\Controllers\backend\QuoteController::class)->group(function (){
-    Route::delete('/quote/destroy/{user}', 'destroyAllQuoteOfThisUser')->name('destroyAllQuoteOfThisUser.quote');
-    Route::get('/modify-quantity-of-quote/quote/{quote}', 'modifyQuantityOfQuote')->middleware("htmlx")->name('modifyQuantityOfQuote.quote');
-    Route::post('/send-devis/{user}', 'sendDevis')->name('sendDevis.quote');
-    Route::post('/add/quote/public', 'sendQuotePublic')->name('send.quote.public');
-
-});*/
-
-Route::controller(\App\Http\Controllers\DevisController::class)->group(function (){
-    Route::delete('/devis/destroy/{user_agent}/{ip_address}', 'destroyAllQuoteOfThisUser')->name('destroyAllQuoteOfThisUser.devis');
-    Route::get('/modify-quantity-of-quote/devis/{devis}', 'modifyQuantityOfQuote')->middleware("htmlx")->name('modifyQuantityOfQuote.devis');
-    Route::post('/devis/send-devis', 'sendDevis')->name('send.devis.public');
-
-});
-
 Route::controller(\App\Http\Controllers\FavoriteController::class)->group(function (){
     //Route::get('/favorite/{article}/{user?}', 'toggle')->middleware("htmlx")->name('favorite');
     Route::get('/favorite/add/cart/{id}/{model}', 'addToQuote')->name('wishlist.cart');
@@ -84,10 +69,7 @@ Route::controller(\App\Http\Controllers\FavoriteController::class)->group(functi
 });
 
 
-//Route::get('/catalog/{user}/{article}', ['as' => 'catalog', 'uses' => 'App\\Http\\Controllers\\CatalogController@toggle'])->middleware("htmlx");
-//Route::get('/articles/generate-pdf/catalog', ['as' => 'generate.catalog', 'uses' => 'App\\Http\\Controllers\\CatalogController@generateCatalogPdf']);
 Route::get('/images/article/{path}', ['as' => 'show.image', 'uses' => 'App\\Http\\Controllers\\ImageController@show'])->where('path', '.*');
-//Route::post('/add/quote/public/{article}', ['as' => 'send.quote.public', 'uses' => 'App\\Http\\Controllers\\QuoteController@sendQuotePublic']);
 
 
 Route::group(['prefix' => 'deleted'], function (){
@@ -182,6 +164,7 @@ Route::group(['prefix' => 'backend'], function () {
     Route::resource('availability', \App\Http\Controllers\backend\AvailabilityController::class);
     Route::resource('offer', \App\Http\Controllers\backend\OfferController::class);
     Route::resource('material', \App\Http\Controllers\backend\MaterialController::class);
+    Route::resource('banner', \App\Http\Controllers\backend\BannerController::class);
 
 
     /*Route::group(['prefix' => 'trash'], function () {

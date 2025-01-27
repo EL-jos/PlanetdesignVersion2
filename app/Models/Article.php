@@ -23,7 +23,14 @@ class Article extends Model
         self::creating(function ($article) {
             $article->id = (string) Str::uuid();
         });
+
+        // Tri par défaut selon la colonne "priority" en ordre croissant
+        static::addGlobalScope('order', function ($builder) {
+            $builder->orderBy('priority', 'asc');
+        });
     }
+
+
 
     public function subcategories()
     {

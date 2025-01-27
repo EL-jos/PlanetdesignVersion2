@@ -100,23 +100,20 @@
                 @csrf
                 @method($article->exists ? 'PUT' : 'POST')
                 <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <input type="number" class="form-control is-valid" name="priority" id="priority" placeholder="Priorité ..." value="{{ $article->exists ? $article->priority : old('priority') }}">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col-sm-6">
                         <div class="form-group">
-                            @if(isset($errors))
-                                <label class="col-form-label" for="name">
-                                    <i class="fas fa-check"></i> Input with success
-                                </label>
-                            @endif
                             <input type="text" class="form-control is-valid" name="name" id="name" placeholder="Nom ..." value="{{ $article->exists ? $article->name : old('name') }}">
                         </div>
                     </div>
                     <div class="col-sm-6">
                         <div class="form-group">
-                            @if(isset($errors))
-                                <label class="col-form-label" for="name">
-                                    <i class="fas fa-check"></i> Input with success
-                                </label>
-                            @endif
                             <input type="text" class="form-control is-valid" name="ugs" id="ugs" placeholder="UGS ..." value="{{ $article->exists ? $article->ugs : old('ugs') }}">
                         </div>
                     </div>
@@ -162,6 +159,7 @@
                                     <div id="el-block-{{ $loop->index }}" class="mb-3 el-container" data-image-id="{{ $document->id }}">
                                         <img src="{{ asset($document->path) }}" alt="..." class="img-thumbnail">
                                         <button class="el-remove"
+                                                type="button"
                                                 hx-delete="{{ route('document.destroy', ['document' => $document, 'isMultiple' => 0]) }}"
                                                 hx-target="#el-block-{{ $loop->index }}"
                                                 hx-trigger="click">

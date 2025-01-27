@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\backend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Banner;
 use App\Models\Category;
 use App\Models\Document;
 use Illuminate\Http\Request;
@@ -10,7 +11,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
-class CategoryController extends Controller
+class BannerController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -19,9 +20,9 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        return view('backend.resources.category.index', [
-            'categories' => Category::all(),
-            'title' => 'Liste des Categories'
+        return view('backend.resources.banner.index', [
+            'banners' => Banner::all(),
+            'title' => 'Liste des Catalogues'
         ]);
     }
 
@@ -32,9 +33,10 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        return view('backend.resources.category.form', [
-            'category' => new Category(),
-            'title' => "Ajoutez une catégorie",
+        return view('backend.resources.banner.form', [
+            'banner' => new Banner(),
+            'title' => "Ajoutez un catalogue",
+            'categories' => Category::all()
         ]);
     }
 
@@ -47,43 +49,45 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|max:255',
+            'url' => 'required|url',
             'document' => 'required|image|mimes:jpeg,jpg,png|max:1024',
+            'category_id' => 'required|exists:categories,id',
         ]);
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
 
-        $category = Category::create([
-            'name' => $request->input('name'),
-            'slug' => Str::slug($request->input('mane'), '-'),
+        $banner = Banner::create([
+            'url' => $request->input('url'),
+            'category_id' => $request->input('category_id'),
         ]);
 
-        if ($category){
+        if ($banner){
 
             if ($request->hasFile('document')) {
                 $files = $request->file('document');
-                $this->saveDocument($files, $category, 'image');
+                $this->saveDocument($files, $banner, 'image');
             }
 
-            return redirect()->route('category.index')->with('success', "Action reusit");
+            return redirect()->route('banner.index')->with('success', "Action reusit");
 
         }
 
-        return redirect()->route('category.index')->with('error', 'Une erreur est survenue')->withInput();
+        return redirect()->route('banner.index')->with('error', 'Une erreur est survenue')->withInput();
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Category  $category
+     * @param  \App\Models\Banner  $banner
      * @return \Illuminate\Http\Response
      */
-    public function edit(Category $category)
+    public function edit(Banner $banner)
     {
-        return view('backend.resources.category.form', [
-            'category' => $category,
-            'title' => "Modifiez une catégorie",
+        return view('backend.resources.banner.form', [
+            'banner' => $banner,
+            'title' => "Modifiez le catalogue",
+            'categories' => Category::all()
         ]);
     }
 
@@ -91,71 +95,52 @@ class CategoryController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Category  $category
+     * @param  \App\Models\Banner  $banner
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Category $category)
+    public function update(Request $request, Banner $banner)
     {
-        //dd($request->all());
         $validator = Validator::make($request->all(), [
-            'name' => 'required|max:255',
+            'url' => 'required|url',
             'document' => 'nullable|image|mimes:jpeg,jpg,png|max:1024',
+            'category_id' => 'required|exists:categories,id',
         ]);
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
 
-        $isUpdate = $category->update([
-            'name' => $request->input('name'),
-            'slug' => Str::slug($request->input('name'), '-'),
+        $isUpdate = $banner->update([
+            'url' => $request->input('url'),
+            'category_id' => $request->input('category_id'),
         ]);
 
         if ($isUpdate){
 
             if ($request->hasFile('document')) {
                 $files = $request->file('document');
-                $this->saveDocument($files, $category, 'image');
+                $this->saveDocument($files, $banner, 'image');
             }
 
-            return redirect()->route('category.index')->with('success', "Action reusit");
+            return redirect()->route('banner.index')->with('success', "Action reusit");
 
         }
 
-        return redirect()->route('category.index')->with('error', 'Une erreur est survenue')->withInput();
+        return redirect()->route('banner.index')->with('error', 'Une erreur est survenue')->withInput();
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Category  $category
+     * @param  \App\Models\Banner  $banner
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Category $category)
+    public function destroy(Banner $banner)
     {
-        if ($category->delete()){
+        $this->deleteImage($banner->document()->where('type', 'iamge')->first()->path);
+        if ($banner->delete()){
             return redirect()->route('category.index')->with('success', "Action reusit");
         }
         return redirect()->route('category.index')->with('error', 'Une erreur est survenue')->withInput();
-    }
-
-    public function trashed(){
-        $categories = Category::onlyTrashed()->get();
-
-        return view('backend.resources.category.index', [
-            'categories' => $categories,
-            'title' => 'Liste des Categories supprimées'
-        ]);
-
-    }
-
-    public function restore(string $id){
-
-        $category = Category::withTrashed()->find($id);
-        if($category->restore()){
-            return redirect()->route('category.index')->with('success', 'Réstauration réussit');
-        }
-        return back()->with('error', 'Echec de réstauration');
-
     }
 
     private function moveImage($file)
@@ -164,9 +149,9 @@ class CategoryController extends Controller
         $formattedDateTime = $currentDateTime->format('Ymd_His');
 
         $path_file = (string) Str::uuid() . '.' . $file->getClientOriginalExtension();
-        $file->move(public_path('assets/resources/categories/'), $path_file);
+        $file->move(public_path('assets/resources/banners/'), $path_file);
 
-        return "assets/resources/categories/" . $path_file;
+        return "assets/resources/banners/" . $path_file;
     }
     private function deleteImage($path)
     {
@@ -175,21 +160,21 @@ class CategoryController extends Controller
         }
     }
 
-    private function saveDocument($files, Category $category, string $type){
+    private function saveDocument($files, Banner $banner, string $type){
 
         if (is_array($files)) {
 
             foreach ($files as $file) {
                 $documentPath = $this->moveImage($file);
                 $document = new Document(['path' => $documentPath, 'type' => $type]);
-                $category->document()->save($document);
+                $banner->document()->save($document);
             }
 
         } else {
 
             $documentPath = $this->moveImage($files);
             $document = new Document(['path' => $documentPath, 'type' => $type]);
-            $category->document()->save($document);
+            $banner->document()->save($document);
 
         }
     }

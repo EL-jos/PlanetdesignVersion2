@@ -21,7 +21,7 @@
         <div class="el-content-area">
             <div class="el-grid-catalogs">
                 @foreach($banners as $banner)
-                    <a target="_blank" href="{{ $banner->url }}" class="el-catalog"><img src="{{ asset($banner->image->path) }}" alt=""></a>
+                    <a target="_blank" href="{{ $banner->url }}" class="el-catalog"><img src="{{ asset($banner->document('type','image')->first()->path) }}" alt=""></a>
                 @endforeach
             </div>
         </div>
