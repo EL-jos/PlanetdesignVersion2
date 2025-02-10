@@ -39,6 +39,7 @@ Route::controller(\App\Http\Controllers\frontend\PageController::class)->group(f
     Route::get('/category/{categorySlug}', 'show_category')->name('category.show');
     Route::get('/category/{categorySlug}/{subcategorySlug}', 'show_subcategory')->name('subcategory.show');
     Route::get('/article/{articleSlug}/{articleRef}', 'show_article')->name('article.show');
+    Route::get('/variant/{articleSlug}/{articleRef}/{variant}', 'show_variant')->name('variant.show');
 
     Route::get('/articles/generate-pdf/catalog', 'generateCatalogPdf')->name('generate.catalog');
     Route::post('/cart/send', 'sendDevis')->name('sendCart.cart');
@@ -119,14 +120,14 @@ Route::group(['prefix' => 'backend'], function () {
         Route::get('/get-articles', 'getArticles')->name('category.getArticles');
         Route::get('/trashed/articles', 'trashed')->name('article.trashed');
         Route::delete('/restore/article/{article}', 'restore')->name('article.restore');
-        Route::delete('/remove/article{article}', 'remove')->name('article.remove');
+        Route::delete('/remove/article{article}', 'forceDelete')->name('article.remove');
     });
 
     Route::controller(\App\Http\Controllers\backend\VariantController::class)->group(function () {
         Route::post('variant/update-document/{variant}', 'uploadDocument')->name('variant.uploadDocument');
         Route::get('/trashed/variants', 'trashed')->name('variant.trashed');
         Route::delete('/restore/variant/{variant}', 'restore')->name('variant.restore');
-        Route::delete('/remove/variant{variant}', 'remove')->name('variant.remove');
+        Route::delete('/remove/variant{variant}', 'forceDelete')->name('variant.remove');
     });
 
     Route::controller(\App\Http\Controllers\backend\ColorController::class)->group(function () {
@@ -156,8 +157,15 @@ Route::group(['prefix' => 'backend'], function () {
         Route::get('/get-subCategories/articles', 'getArticles')->name('subcategory.getArticles');
     });
 
+    Route::controller(\App\Http\Controllers\backend\DealController::class)->group(function () {
+        Route::post('deal/update-document/{deal}', 'uploadDocument')->name('deal.uploadDocument');
+        Route::get('/trashed/deals', 'trashed')->name('deal.trashed');
+        Route::delete('/restore/deal/{deal}', 'restore')->name('deal.restore');
+        Route::delete('/remove/deal{deal}', 'forceDelete')->name('deal.remove');
+    });
+
     Route::resource('article', \App\Http\Controllers\backend\ArticleController::class)->except(['show']);
-    Route::resource('variant', \App\Http\Controllers\backend\VariantController::class);
+    Route::resource('variant', \App\Http\Controllers\backend\VariantController::class)->except(['show']);
     Route::resource('color', \App\Http\Controllers\backend\ColorController::class);
     Route::resource('size', \App\Http\Controllers\backend\SizeController::class);
     Route::resource('quote', \App\Http\Controllers\backend\QuoteController::class);
@@ -165,6 +173,34 @@ Route::group(['prefix' => 'backend'], function () {
     Route::resource('offer', \App\Http\Controllers\backend\OfferController::class);
     Route::resource('material', \App\Http\Controllers\backend\MaterialController::class);
     Route::resource('banner', \App\Http\Controllers\backend\BannerController::class);
+    Route::resource('deal', \App\Http\Controllers\backend\DealController::class)->except(['show']);
+
+    Route::get('/test/variant', function (){
+
+        /*$variants = \App\Models\Variant::all();
+
+        foreach ($variants as $variant) {
+
+            if($variant->color){
+                $variant->ugs = $variant->article->ugs .'-'. $variant->color->code;
+            }elseif ($variant->size){
+                $variant->ugs = $variant->article->ugs .'-'. $variant->size->name;
+            }
+
+            $variant->save();
+
+        }*/
+
+        $articles = \App\Models\Article::all();
+
+        foreach ($articles as $article){
+            $article->slug = \Illuminate\Support\Str::slug($article->name);
+            $article->save();
+        }
+
+        dd('Terminée');
+
+    });
 
 
     /*Route::group(['prefix' => 'trash'], function () {

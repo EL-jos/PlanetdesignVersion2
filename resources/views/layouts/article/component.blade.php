@@ -31,7 +31,7 @@
         </div>
         <div class="el-content">
             <a href="{{ route('article.show', ['articleSlug' => $article->slug, 'articleRef' => $article->ugs]) }}">
-                <h2 class="el-name-article">{{ $article->name }}</h2>
+                <h2 class="el-name-article">{{ \Illuminate\Support\Str::title($article->name) }}</h2>
             </a>
             <div id="el-content-{{$article->id}}">
                 @include('layouts.article.content', ['article' => $article, 'user' => $user])

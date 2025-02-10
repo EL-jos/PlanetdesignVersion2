@@ -40,7 +40,15 @@
                         @if($user->wishlist)
                             @foreach($user->wishlist->items as $item)
                                 @php
+
                                     switch($item->wishlistable_type){
+                                        case "App\Models\Variant":
+                                            $variant = \App\Models\Variant::find($item->wishlistable_id);
+                                            $article = $variant->article;
+                                            $filename = $variant->document()->where('type','image')->first()
+                                                        ? $variant->document()->where('type','image')->first()->path
+                                                        : $variant->article->documents()->where('type','image')->first()->path;
+                                            break;
                                         case "App/Models/Variant":
                                             $variant = \App\Models\Variant::find($item->wishlistable_id);
                                             $article = $variant->article;
@@ -73,7 +81,6 @@
                                     </td>
                                 </tr>
                             @endforeach
-                        @else
 
                         @endif
                         </tbody>

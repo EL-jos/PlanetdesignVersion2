@@ -49,6 +49,13 @@
 
                                 @php
                                     switch($item->catalogable_type){
+                                        case "App\Models\Variant":
+                                            $variant = \App\Models\Variant::find($item->catalogable_id);
+                                            $article = $variant->article;
+                                            $filename = $variant->document()->where('type','image')->first()
+                                                        ? $variant->document()->where('type','image')->first()->path
+                                                        : $variant->article->documents()->where('type','image')->first()->path;
+                                            break;
                                         case "App/Models/Variant":
                                             $variant = \App\Models\Variant::find($item->catalogable_id);
                                             $article = $variant->article;
@@ -71,7 +78,7 @@
                                             @if($variant->color)
                                                 <li style="margin: 1rem 0 0 1rem;">{{ $variant->color->name }} ({{ \Illuminate\Support\Str::upper($variant->ugs) }})</li>
                                             @elseif($variant->size)
-                                                <li style="margin: 1rem 0 0 1rem;">{{ $variant->size->name}}< ({{ \Illuminate\Support\Str::upper($variant->ugs) }})/li>
+                                                <li style="margin: 1rem 0 0 1rem;">{{ $variant->size->name}} ({{ \Illuminate\Support\Str::upper($variant->ugs) }})</li>
                                             @endif
 
                                         @endif
@@ -79,29 +86,6 @@
                                     <td class="el-controls">
                                         <a href="javascript:;" onclick="document.getElementById('el-delete-catalog-{{ $item->id }}').submit()" class="el-btn el-danger el-center-box">
                                             <form action="{{ route("catalog.remove", $item) }}" method="POST" id="el-delete-catalog-{{ $item->id }}">
-                                                @csrf
-                                                @method("DELETE")
-                                            </form>
-                                            <i class="far fa-trash-alt"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        @else
-                            @foreach($tab_catalogs as $catalog)
-                                <tr>
-                                    <td><img src="{{ asset($catalog->article->first_image) }}" alt=""></td>
-                                    <td>
-                                        <h4><a href="{{ route('article.show', ['articleSlug' => $catalog->article->slug, 'articleRef' => $catalog->article->reference]) }}">{{ $catalog->article->name }}</a></h4>
-                                        <ul>
-                                            @foreach($catalog->colors as $color)
-                                                <li>{{ $color->name }}</li>
-                                            @endforeach
-                                        </ul>
-                                    </td>
-                                    <td class="el-controls">
-                                        <a href="javascript:;" onclick="document.getElementById('el-delete-catalog-{{ $catalog->id }}').submit()" class="el-btn el-danger el-center-box">
-                                            <form action="{{ route("catalog.destroy", $catalog) }}" method="POST" id="el-delete-catalog-{{ $catalog->id }}">
                                                 @csrf
                                                 @method("DELETE")
                                             </form>

@@ -48,6 +48,13 @@
                                 @foreach($user->cart->items as $item)
                                     @php
                                         switch($item->cartable_type){
+                                            case "App\Models\Variant":
+                                                $variant = \App\Models\Variant::find($item->cartable_id);
+                                                $article = $variant->article;
+                                                $filename = $variant->document()->where('type','image')->first()
+                                                            ? $variant->document()->where('type','image')->first()->path
+                                                            : $variant->article->documents()->where('type','image')->first()->path;
+                                                break;
                                             case "App/Models/Variant":
                                                 $variant = \App\Models\Variant::find($item->cartable_id);
                                                 $article = $variant->article;
@@ -70,7 +77,7 @@
                                                 @if($variant->color)
                                                     <li style="margin: 1rem 0 0 1rem;">{{ $variant->color->name }} ({{ \Illuminate\Support\Str::upper($variant->ugs) }})</li>
                                                 @elseif($variant->size)
-                                                    <li style="margin: 1rem 0 0 1rem;">{{ $variant->size->name}}< ({{ \Illuminate\Support\Str::upper($variant->ugs) }})/li>
+                                                    <li style="margin: 1rem 0 0 1rem;">{{ $variant->size->name}} ({{ \Illuminate\Support\Str::upper($variant->ugs) }})</li>
                                                 @endif
 
                                             @endif

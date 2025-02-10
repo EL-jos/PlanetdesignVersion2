@@ -171,7 +171,12 @@ class VariantController extends Controller
      */
     public function destroy(Variant $variant)
     {
-        //
+        $this->deleteImage($variant->document->path);
+
+        if($variant->delete()){
+            return redirect()->route('variant.index')->with('success', "Action reusit");
+        }
+        return redirect()->route('variant.index')->with('error', 'Une erreur est survenue')->withInput();
     }
 
     private function moveImage($file)
@@ -253,4 +258,21 @@ class VariantController extends Controller
         return back()->with('error', 'Echec de réstauration');
 
     }
+    
+    public function forceDelete(string $id){
+        
+        $variant = Variant::withTrashed()->find($id);
+        $this->deleteImage($variant->document->path);
+    
+        if (!$variant) {
+            return back()->with('error', 'Variante introuvable');
+        }
+    
+        if ($variant->forceDelete()) {
+            return redirect()->route('variant.index')->with('success', 'Suppression définitive réussie');
+        }
+    
+        return redirect()->back()->with('error', 'Échec de la suppression définitive');
+    }
+
 }

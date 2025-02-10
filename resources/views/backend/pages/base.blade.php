@@ -292,6 +292,14 @@
                             </p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{{ route("deal.index") }}" @class(["nav-link", "active" => str_contains($route, 'deal.')])>
+                            <i class="nav-icon fas fa-th"></i>
+                            <p>
+                                Bonnes affaires
+                            </p>
+                        </a>
+                    </li>
                     {{--<li class="nav-item">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-copy"></i>

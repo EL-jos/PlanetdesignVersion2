@@ -1,5 +1,8 @@
-@if($article->variants->count() > 1)
+@if($article->variants->count() >= 1 || $article->documents()->where('type', 'image')->get()->count() >= 1 )
     <div class="owl-carousel">
+        @foreach($article->documents()->where('type', 'image')->get() as $document)
+            <img src="{{ asset($document->path) }}" data-src="{{ asset($document->path) }}" alt="{{ $article->name }}">
+        @endforeach
         @foreach($article->variants as $variant)
             <img src="{{ asset($variant->image->path) }}" data-src="{{ asset($variant->image->path) }}" data-id="{{ $variant->id }}" data-model="{{ \App\Models\Variant::class }}" alt="{{ $article->name }}">
         @endforeach

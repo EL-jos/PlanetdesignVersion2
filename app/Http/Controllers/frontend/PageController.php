@@ -20,6 +20,7 @@ use App\Models\Offer;
 use App\Models\Order;
 use App\Models\Subcategory;
 use App\Models\User;
+use App\Models\Variant;
 use App\Models\Wishlist;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -73,9 +74,6 @@ class PageController extends Controller
         ]);
     }
 
-    /**
-     * @param User $user
-     */
     public function wishlist(){
 
         /**
@@ -101,7 +99,6 @@ class PageController extends Controller
      *
      * @param User $user
      */
-
     public function cart(User $user){
         if(!session()->has('user')){
             $user = new User();
@@ -115,7 +112,7 @@ class PageController extends Controller
     }
 
     public function arrival(){
-        $articles = Article::where('availability_id', '=', 1)->paginate(33);
+        $articles = Article::where('availability_id', '=', 7)->paginate(33);
         return view('arrival', [
             'title' => 'Nouvel arrivage',
             'description' => "<p>Voici notre sélection de notre nouvel arrivage</p>",
@@ -129,7 +126,7 @@ class PageController extends Controller
         /**
          * @var Article $articles
          */
-        $articles = Article::where('availability_id', '=', 5)->paginate(33);
+        $articles = Article::where('availability_id', '=', 4)->paginate(33);
         return view('arrival', [
             'title' => 'Déstockage',
             'description' => '<p>Des prix exceptionnels sur une sélection d’articles</p>',
@@ -437,8 +434,8 @@ class PageController extends Controller
     public function search(Request $request){
         //dd($request->all());
         $keyword = '%' . htmlentities($request->input('Keyword')) . '%';
-        $articles = Article::where('reference', 'LIKE', $keyword)
-            ->orWhere('description', 'LIKE', $keyword)
+        $articles = Article::where('ugs', 'LIKE', $keyword)
+            ->orWhere('content', 'LIKE', $keyword)
             ->get();
         //dd($keyword, $articles);
         return view('search', [
@@ -500,6 +497,14 @@ class PageController extends Controller
 
         return view('article',[
             'article' => $article
+        ]);
+    }
+
+    public function show_variant(string $articleSlug, string $articleRef, Variant $variant){
+
+        return view('article',[
+            'article' => $variant->article,
+            'variantSelected' => $variant
         ]);
     }
 

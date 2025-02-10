@@ -21,8 +21,8 @@
         <div class="el-content-area">
             <div class="el-grid-catalogs">
                 @foreach($deals as $deal)
-                    <a target="_blank" href="{{ route('article.show', ['articleSlug' => $deal->article->slug, 'articleRef' => $deal->article->reference]) }}" class="el-catalog">
-                        <img src="{{ asset($deal->image ? $deal->image->path : '') }}" alt="">
+                    <a target="_blank" href="{{ route('article.show', ['articleSlug' => $deal->article->slug, 'articleRef' => $deal->article->ugs]) }}" class="el-catalog">
+                        <img src="{{ asset($deal->document ? $deal->document->path : '') }}" alt="{{ $deal->article->name }}">
                     </a>
                 @endforeach
             </div>

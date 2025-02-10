@@ -108,6 +108,29 @@ class DocumentController extends Controller
         }
     }
 
+    public function updateDocumentOrder(Request $request){
+        //dd($request->all());
+        $imageIds = json_decode($request->input('imageIds'));
+        $articleId = $request->input('article_id');
+
+        // Récupérez l'article associé
+        $article = Article::findOrFail($articleId);
+
+        // Récupérez les images liées à l'article dans l'ordre actuel
+        $images = $article->documents()->where('type', 'image')->get();
+
+
+        // Mettez à jour l'ordre des images en fonction des identifiants triés
+        foreach ($imageIds as $index => $imageId) {
+            $image = $images->where('id', $imageId)->first();
+
+            if ($image) {
+                $image->update(['priority' => $index + 1]);
+            }
+        }
+        // Retournez une réponse appropriée (par exemple, un message de succès)
+        return response()->json(['message' => 'L\'ordre des images a été mis à jour avec succès.', 'code' => 0]);
+    }
     public function updateDocumentQuote(Request $request){
         //dd($request->all());
         $imageIds = json_decode($request->input('imageIds'));

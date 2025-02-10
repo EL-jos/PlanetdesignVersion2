@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -24,7 +25,7 @@ class Document extends Model
     {
         // Tri par défaut selon la colonne "priority" en ordre croissant
         static::addGlobalScope('order', function ($builder) {
-            //$builder->orderBy('priority', 'asc');
+            $builder->orderBy('priority', 'asc');
         });
     }
 

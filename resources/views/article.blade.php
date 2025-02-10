@@ -9,17 +9,17 @@
 @endphp
 
 @section('title', $article->name)
-@section('description', htmlspecialchars_decode(strip_tags($article->description)))
+@section('description', htmlspecialchars_decode(strip_tags($article->content)))
 
 @section('og_title', $article->name)
-@section('og_description', htmlspecialchars_decode(strip_tags($article->description)))
+@section('og_description', htmlspecialchars_decode(strip_tags($article->content)))
 @section('og_image', asset($article->first_image))
 @section('og_url', \Illuminate\Support\Facades\URL::current())
 @section('og_type', 'article')
 
 
 @section('twitter_title', $article->name)
-@section('twitter_description', htmlspecialchars_decode(strip_tags($article->description)))
+@section('twitter_description', htmlspecialchars_decode(strip_tags($article->content)))
 @section('twitter_image', asset($article->first_image))
 @section('twitter_url', \Illuminate\Support\Facades\URL::current())
 
@@ -64,20 +64,29 @@
                 <legend class="el-ref-article">Réf.: {{ $article->ugs }}</legend>
                 <div class="el-container">
                     <article class="el-single-product">
-                        <img class="el-big-picture" src="{{ asset($article->images->first()->path) }}" alt="{{ $article->name }}">
+                        <img class="el-big-picture" src="{{ asset(!isset($variantSelected) ? $article->images->first()->path : $variantSelected->document->path) }}" alt="{{ $article->name }}" />
                         @if($article->documents()->where('type','image')->count() > 0)
                             <div class="el-nav-picture owl-carousel">
                                 @if($article->variant_is_color)
 
-                                    @foreach($article->variants as $variant)
-                                        <img src="{{ asset($variant->document->path) }}" data-src="{{ asset($variant->document->path) }}" data-id="{{ $variant->id }}" data-model="{{ \App\Models\Variant::class }}" alt="{{ $article->name }}">
-                                    @endforeach
-
-                                    @foreach($article->documents()->where('type', 'image')->get() as $document)
-                                        <img src="{{ asset($document->path) }}" data-src="{{ asset($document->path) }}" data-id="{{ $article->id }}" data-model="{{ \App\Models\Article::class }}" alt="{{ $article->name }}">
+                                    @foreach($article->variants as $variantImageColor)
+                                        <img src="{{ asset($variantImageColor->document->path) }}" data-src="{{ asset($variantImageColor->document->path) }}" data-id="{{ $variantImageColor->id }}" data-model="{{ \App\Models\Variant::class }}" alt="{{ $article->name }}">
                                     @endforeach
 
                                 @endif
+
+                                @if($article->variant_is_size)
+
+                                    @foreach($article->variants as $variantImageSize)
+                                        <img src="{{ asset($variantImageSize->document->path) }}" data-src="{{ asset($variantImageSize->document->path) }}" data-id="{{ $variantImageSize->id }}" data-model="{{ \App\Models\Variant::class }}" alt="{{ $article->name }}">
+                                    @endforeach
+
+                                @endif
+
+                                @foreach($article->documents()->where('type', 'image')->get() as $document)
+                                    <img src="{{ asset($document->path) }}" data-src="{{ asset($document->path) }}" data-id="{{ $article->id }}" data-model="{{ \App\Models\Article::class }}" alt="{{ $article->name }}">
+                                @endforeach
+
                             </div>
                         @endif
                     </article>
@@ -86,29 +95,44 @@
                             <h3>Informations sur le produit ?</h3>
                             <div>
                                 <h2>Details:</h2>
-                                <p>{!! $article->description !!}</p>
-                                @if(!empty($article->variants->count()))
-
-
-
-                                @endif
-                                {{--@if($article->variant_is_color && !$article->variant_is_size)
+                                <p>{!! $article->content !!}</p>
+                                @if($article->variant_is_color && !$article->variant_is_size)
                                     <h2>Couleur:</h2>
-                                    <select name="color_id" id="color_id">
-                                        <option value="">Couleur ?</option>
-                                        @foreach($article->variants as $variant)
-                                            <option value="{{ $variant->color->id }}">{{ $variant->color->name }}</option>
+                                    <div id="el-container-variants">
+
+                                        @foreach($article->variants as $variantChoiseColor)
+
+                                            <a href="{{ route('variant.show', [
+                                                    'articleSlug' => $variantChoiseColor->article->slug,
+                                                    'articleRef' => $variantChoiseColor->article->ugs,
+                                                    'variant'=> $variantChoiseColor->id
+                                                ]) }}" class="el-variant-color">
+                                                <img src="{{ asset($variantChoiseColor->color->document->path) }}" />
+                                                <span>{{ \Illuminate\Support\Str::title($variantChoiseColor->color->name) }}</span>
+                                            </a>
+
                                         @endforeach
-                                    </select>
+
+                                    </div>
+
                                 @elseif(!$article->variant_is_color && $article->variant_is_size)
                                     <h2>Taille:</h2>
-                                    <select name="size_id" id="size_id">
-                                        <option value="">Taille ?</option>
-                                        @foreach($article->variants as $variant)
-                                            <option value="{{ $variant->size->id }}">{{ $variant->size->name }}</option>
+                                    <div id="el-container-variants">
+
+                                        @foreach($article->variants as $variantChoiseSize)
+
+                                            <a href="{{ route('variant.show', [
+                                                    'articleSlug' => $variantChoiseSize->article->slug,
+                                                    'articleRef' => $variantChoiseSize->article->ugs,
+                                                    'variant'=> $variantChoiseSize->id
+                                                ]) }}" class="el-variant-size">
+                                                <span>{{ \Illuminate\Support\Str::title($variantChoiseSize->size->name) }}</span>
+                                            </a>
+
                                         @endforeach
-                                    </select>
-                                @elseif($article->variant_is_color && $article->variant_is_size)
+
+                                    </div>
+                                {{--@elseif($article->variant_is_color && $article->variant_is_size)
                                     <h2>Couleur:</h2>
                                     <select name="color_id" id="color_id">
                                         <option value="">Couleur ?</option>
@@ -122,30 +146,48 @@
                                         @foreach($article->variants as $variant)
                                             <option value="{{ $variant->size->id }}">{{ $variant->size->name }}</option>
                                         @endforeach
-                                    </select>
-                                @endif--}}
-                                <p class="el-disponibility">{{ $article->availability ? $article->availability->name : '' }}</p>
+                                    </select>--}}
+                                @endif
+                                <p class="el-disponibility">{{ $article->availability ? \Illuminate\Support\Str::title($article->availability->name) : '' }}</p>
                                 <h2>Quantité désirée</h2>
                                 <input type="number" name="quantity" id="quantity" min="1" value="1" />
                             </div>
                         </div>
 
-                        {{--<a href="javascript:;"
-                           hx-get="{{ route('favorite', ['user' => $user, 'article' => $article]) }}"
-                           hx-trigger="click"
-                           hx-target="#el-btn-favorite span"
+                        <a @if(isset($variantSelected)) href="{{ route('addWishlist.page', ['id' => $variantSelected->id, 'model' => \App\Models\Variant::class]) }}"
+                           @else href="{{ route('addWishlist.page', ['id' => $article->id, 'model' => \App\Models\Article::class]) }}" @endif
                            class="el-btn"
                             id="el-btn-favorite">
                             <span>
-                                @include('layouts.favorite.favorite', ['user' => $user, 'article' => $article])
+                                @php
+                                    /**
+                                     * @var \App\Models\User $user
+                                     */
+                                    $user = \App\Models\User::findOrfail(session('user'));
+                                    $wishlist = $user->wishlist;
+                                    $isInWishlist = collect([]);
+                                    if($wishlist){
+
+                                        $ids = collect([]);
+                                        $ids->push($article->id);
+                                            if(!empty($article->variants->count())){
+                                                $article->variants->map(function ($item) use ($ids){
+                                                    $ids->push($item->id);
+                                                });
+                                            }
+                                            $isInWishlist = $wishlist->items()->whereIn('wishlistable_id', $ids->toArray())->get();
+                                    }
+
+                                @endphp
+                                <i class="{{ empty($isInWishlist->count()) ? 'far' : 'fas' }} fa-heart"></i>
                             </span>
                             Ajouter à la liste de favoris
-                        </a>--}}
-                        <a href="{{ route('addCatalog.page', ['id' => $article->id, 'model' => \App\Models\Article::class]) }}" id="el-add-catalog" class="el-btn">
+                        </a>
+                        <a @if(isset($variantSelected)) href="{{ route('addCatalog.page', ['id' => $variantSelected->id, 'model' => \App\Models\Variant::class]) }}" @else href="{{ route('addCatalog.page', ['id' => $article->id, 'model' => \App\Models\Article::class]) }}" @endif  id="el-add-catalog" class="el-btn">
                             <i class="fas fa-list"></i>
                             Ajouter au catalogue
                         </a>
-                        <a href="{{ route('addCart.page', ['id' => $article->id, 'model' => \App\Models\Article::class]) }}" id="el-add-cart" class="el-btn">
+                        <a @if(isset($variantSelected)) href="{{ route('addCart.page', ['id' => $variantSelected->id, 'model' => \App\Models\Variant::class]) }}" @else href="{{ route('addCart.page', ['id' => $article->id, 'model' => \App\Models\Article::class]) }}" @endif  id="el-add-cart" class="el-btn">
                             <i class="fas fa-file-alt"></i>
                             Ajouter au devis
                         </a>

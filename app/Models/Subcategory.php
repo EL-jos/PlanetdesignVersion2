@@ -10,7 +10,7 @@ class Subcategory extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['name', 'slug', 'category_id'];
+    protected $fillable = ['name', 'slug', 'category_id', 'content'];
 
     public function category(){
         return $this->belongsTo(Category::class);

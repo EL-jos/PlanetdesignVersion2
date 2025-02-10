@@ -85,6 +85,13 @@
 
         @php
             switch($item->catalogable_type){
+                case "App\Models\Variant":
+                    $variant = \App\Models\Variant::find($item->catalogable_id);
+                    $article = $variant->article;
+                    $filename = $variant->document()->where('type','image')->first()
+                                ? $variant->document()->where('type','image')->first()->path
+                                : $variant->article->documents()->where('type','image')->first()->path;
+                    break;
                 case "App/Models/Variant":
                     $variant = \App\Models\Variant::find($item->catalogable_id);
                     $article = $variant->article;

@@ -7,17 +7,17 @@
 @endphp
 
 @section('title', $subcategory->name)
-@section('description', htmlspecialchars_decode(strip_tags($subcategory->description)))
+@section('description', htmlspecialchars_decode(strip_tags($subcategory->content)))
 
 @section('og_title', $subcategory->name)
-@section('og_description', htmlspecialchars_decode(strip_tags($subcategory->description)))
+@section('og_description', htmlspecialchars_decode(strip_tags($subcategory->content)))
 @section('og_image', asset($subcategory->first_image))
 @section('og_url', \Illuminate\Support\Facades\URL::current())
 @section('og_type', 'article')
 
 
 @section('twitter_title', $subcategory->name)
-@section('twitter_description', htmlspecialchars_decode(strip_tags($subcategory->description)))
+@section('twitter_description', htmlspecialchars_decode(strip_tags($subcategory->content)))
 @section('twitter_image', asset($subcategory->first_image))
 @section('twitter_url', \Illuminate\Support\Facades\URL::current())
 
@@ -59,7 +59,7 @@
     <section id="el-about-categorie" class="el-center-box" >
         <div class="el-content-area">
             <h2 class="el-title-categorie">{{ $subcategory->name }}</h2>
-            <div class="el-description-categorie">{!! $subcategory->description !!}</div>
+            <div class="el-description-categorie">{!! $subcategory->content !!}</div>
         </div>
     </section>
     @include('layouts.article.filter', ['colors' => $colors, 'materials' => $materials, 'availabilities' => $availabilities])

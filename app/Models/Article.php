@@ -62,6 +62,10 @@ class Article extends Model
         return $this->belongsTo(Availability::class);
     }
 
+    public function deals(){
+        return $this->hasOne(Deal::class);
+    }
+
     public function variants()
     {
         return $this->hasMany(Variant::class);
@@ -113,12 +117,21 @@ class Article extends Model
 
     public function getVariantIsColorAttribute(): bool{
         //dd($this->variants->first()->color === null);
-        return $this->variants->first()->color !== null;
+        if($this->variants->count() >= 1){
+            return $this->variants->first()->color !== null;
+        }
+
+        return false;
+
     }
 
     public function getVariantIsSizeAttribute(): bool{
         //dd($this->variants->first()->size === null);
-        return $this->variants->first()->size !== null;
+        if($this->variants->count() >= 1){
+            return $this->variants->first()->size !== null;
+        }
+
+        return false;
     }
 
 }

@@ -53,6 +53,7 @@ class SubcategoryController extends Controller
             'name' => 'required|max:255',
             'category_id' => 'required|exists:categories,id',
             'document' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:1024',
+            'content' => 'nullable|string'
         ]);
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
@@ -62,6 +63,7 @@ class SubcategoryController extends Controller
             'name' => $request->input('name'),
             'category_id' => $request->input('category_id'),
             'slug' => Str::slug($request->input('mane'), '-'),
+            'content' => $request->input('content'),
         ]);
 
         if ($subcategory){
@@ -107,6 +109,7 @@ class SubcategoryController extends Controller
             'name' => 'required|max:255',
             'category_id' => 'required|exists:categories,id' ,
             'document' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:1024',
+            'content' => 'nullable|string'
         ]);
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
@@ -116,6 +119,7 @@ class SubcategoryController extends Controller
             'name' => $request->input('name'),
             'category_id' => $request->input('category_id'),
             'slug' => Str::slug($request->input('name'), '-'),
+            'content' => $request->input('content'),
         ]);
 
         if ($isUpdate){

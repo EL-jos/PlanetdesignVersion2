@@ -49,8 +49,10 @@
                             <tr>
                                 <th>No.</th>
                                 <th>Image</th>
+                                <th>Référence</th>
                                 <th>Name</th>
                                 <th>Catégorie</th>
+                                <th>Disponibilité</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -59,6 +61,7 @@
                                 <tr>
                                     <td>{{ $loop->index  + 1}}</td>
                                     <td> <img height="71px" src="{{ $article->documents()->where('type','image')->first() ? asset($article->documents()->where('type','image')->first()->path) : '' }}"></td>
+                                    <td>{{ \Illuminate\Support\Str::upper($article->ugs) }}</td>
                                     <td>{{ $article->name }}</td>
                                     <td>
                                         @foreach($article->subcategories as $subcategory)
@@ -70,6 +73,7 @@
 
                                         @endforeach
                                     </td>
+                                    <td>{{ \Illuminate\Support\Str::title($article->availability->name) }}</td>
                                     <td>
                                         <div class="d-flex" style="gap: .5rem;">
                                             @if(!$article->trashed())
@@ -106,8 +110,10 @@
                             <tr>
                                 <th>No.</th>
                                 <th>Image</th>
+                                <th>Référence</th>
                                 <th>Name</th>
                                 <th>Catégorie</th>
+                                <th>Disponibilité</th>
                                 <th>Action</th>
                             </tr>
                         </tfoot>

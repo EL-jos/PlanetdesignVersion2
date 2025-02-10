@@ -11,6 +11,7 @@
     <link href="https://unpkg.com/filepond-plugin-image-edit/dist/filepond-plugin-image-edit.css" rel="stylesheet"/>
     <!-- SELECT2 -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ asset('assets/backend/plugins/summernote/summernote-bs4.min.css')}}">
 
     <!-- SORTABLE -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
@@ -156,6 +157,12 @@
                     @include('backend.layouts.file', ['isMultiple' => false])
                 @endif
 
+                <div class="row">
+                    <div class="col-12">
+                        <textarea id="summernote" name="content"> {{ $subcategory->content ?? old('content') }} </textarea>
+                    </div>
+                </div>
+
                 <div style="padding: 0" class="card-footer">
                     <button type="submit" class="btn btn-primary">
                         @if($subcategory->exists)
@@ -175,6 +182,7 @@
     <script src="{{ asset('assets/backend/plugins/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
     <script src="{{ asset('assets/backend/plugins/bs-custom-file-input/bs-custom-file-input.min.js')}}"></script>
     <script src="{{ asset('assets/backend/dist/js/adminlte.min2167.js?v=3.2.0')}}"></script>
+    <script src="{{ asset('assets/backend/plugins/summernote/summernote-bs4.min.js')}}"></script>
     <!-- SELECT2 -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <!-- SWEET ALERT -->
@@ -192,6 +200,7 @@
                 placeholder: 'Catégorie ?'
             });
 
+            $('#summernote').summernote();
         });
     </script>
     @if(session()->has('success'))

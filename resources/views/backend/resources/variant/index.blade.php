@@ -85,9 +85,9 @@
                                                     <i class="fas fa-trash-alt"></i>
                                                 </button>
                                             @else
-                                                <a href="{{ route('restore.variant', $variant) }}" class="btn bg-gradient-warning"><i class="fas fa-trash-restore"></i></a>
+                                                <a href="{{ route('variant.restore', $variant) }}" class="btn bg-gradient-warning"><i class="fas fa-trash-restore"></i></a>
                                                 <button class="btn bg-gradient-danger" onclick="document.getElementById('el-form-{{$variant->id}}').submit()">
-                                                    <form id="el-form-{{$variant->id}}" action="" method="post">
+                                                    <form id="el-form-{{$variant->id}}" action="{{ route('variant.remove', $variant) }}" method="post">
                                                         @csrf
                                                         @method('DELETE')
                                                     </form>

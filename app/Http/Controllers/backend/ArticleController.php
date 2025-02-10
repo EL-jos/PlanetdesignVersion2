@@ -170,7 +170,7 @@ class ArticleController extends Controller
     public function destroy(Article $article)
     {
         foreach ($article->documents as $document) {
-            $this->deleteImage($document);
+            $this->deleteImage($document->path);
         }
 
         if($article->delete()){
@@ -197,6 +197,24 @@ class ArticleController extends Controller
         }
         return back()->with('error', 'Echec de réstauration');
 
+    }
+    
+    public function forceDelete(string $id){
+        
+        $article = Article::withTrashed()->find($id);
+        foreach ($article->documents as $document) {
+            $this->deleteImage($document->path);
+        }
+    
+        if (!$article) {
+            return back()->with('error', 'article introuvable');
+        }
+    
+        if ($article->forceDelete()) {
+            return redirect()->route('article.index')->with('success', 'Suppression définitive réussie');
+        }
+    
+        return redirect()->back()->with('error', 'Échec de la suppression définitive');
     }
 
     private function moveImage($file)

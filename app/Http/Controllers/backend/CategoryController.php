@@ -49,6 +49,7 @@ class CategoryController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|max:255',
             'document' => 'required|image|mimes:jpeg,jpg,png|max:1024',
+            'content' => 'nullable|string'
         ]);
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
@@ -57,6 +58,7 @@ class CategoryController extends Controller
         $category = Category::create([
             'name' => $request->input('name'),
             'slug' => Str::slug($request->input('mane'), '-'),
+            'content' => $request->input('content'),
         ]);
 
         if ($category){
@@ -100,6 +102,7 @@ class CategoryController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|max:255',
             'document' => 'nullable|image|mimes:jpeg,jpg,png|max:1024',
+            'content' => 'nullable|string'
         ]);
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
@@ -108,6 +111,7 @@ class CategoryController extends Controller
         $isUpdate = $category->update([
             'name' => $request->input('name'),
             'slug' => Str::slug($request->input('name'), '-'),
+            'content' => $request->input('content'),
         ]);
 
         if ($isUpdate){

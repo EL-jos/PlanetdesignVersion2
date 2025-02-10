@@ -122,7 +122,7 @@
                         <div class="el-select2">
                             <select id="article_id" name="article_id"  class="form-control el-select">
                                 @if($variant->exists)
-                                    <option value="{{ $variant->article->id }}">{{ \Illuminate\Support\Str::title($variant->article->name) }}</option>
+                                    <option value="{{ $variant->article->id }}">{{ \Illuminate\Support\Str::title($variant->article->name) }} <=> {{ \Illuminate\Support\Str::title($variant->article->ugs) }}</option>
                                 @else
                                     <option value="">Article ?</option>
                                 @endif
@@ -295,8 +295,10 @@
                 placeholder: 'Sous Category ?',
                 disabled: true,
             }).on('change', (e) => {
-
-                let subcategoriyId = e.target.options.selectedIndex;
+        
+                //let subcategoriyId = e.target.options.selectedIndex;
+                let subcategoriyId = parseInt($(e.target).val());
+                //console.log(e.target, $(e.target).val());
                 // Activer le sélecteur d'articles et récupérer les articles
                 $('#article_id').prop('disabled', false).trigger('change');
 
@@ -320,7 +322,7 @@
 
                             $articleSelect.append($('<option>', {
                                 value: article.id,
-                                text: article.name
+                                text: `${article.name} <=> ${article.ugs}`
                             }));
 
                         });
